@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
 - Студент: [Иван Шуклин](https://up.htmlacademy.ru/ecmascript-individual/2/user/2430255).
-- Наставник: `Евгений Лепёшкин`.
+- Наставник: [Евгений Лепёшкин](https://htmlacademy.ru/profile/spearance).
 
 ---
 
