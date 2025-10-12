@@ -1,55 +1,58 @@
-import { getRandomArrayElement } from '../utils.js';
-import { EVENT_TYPES } from '../const.js';
+import { getRandomInteger, getRandomArrayElement } from '../utils.js';
 
-export const mockPoints = [
+const mockPoints = [
   {
-    id: 'f4b62099-293f-4c3d-a702-94eec4a2808c',
-    basePrice: 1100,
+    id: '1',
+    basePrice: getRandomInteger(300, 500),
     dateFrom: '2019-07-10T22:55:56.845Z',
     date: '2019-07-11T11:22:13.375Z',
     destination: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e04',
     favorite: false,
     offers: ['b4c3e4e6-9053-42ce-b747-e281314baa31'],
-    type: getRandomArrayElement(EVENT_TYPES),
+    type: 'taxi',
   },
   {
-    id: 'f4b62099-293f-4c3d-a702-94eec4a2808d',
-    basePrice: 2800,
+    id: '2',
+    basePrice: getRandomInteger(800, 1500),
     dateFrom: '2019-07-10T22:55:56.845Z',
     date: '2019-07-11T11:22:13.375Z',
     destination: 'cfe416cq-10xa-ye10-8077-2fs9a01edcab',
     favorite: true,
     offers: ['b4c3e4e6-9053-42ce-b747-e281314baa31'],
-    type: getRandomArrayElement(EVENT_TYPES),
+    type: 'flight',
   },
   {
-    id: 'f4b62099-293f-4c3d-a702-94eec4a2808e',
-    basePrice: 1100,
+    id: '3',
+    basePrice: getRandomInteger(800, 1500),
     dateFrom: '2019-07-10T22:55:56.845Z',
     date: '2019-07-11T11:22:13.375Z',
     destination: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e04',
     favorite: false,
     offers: ['b4c3e4e6-9053-42ce-b747-e281314baa31'],
-    type: getRandomArrayElement(EVENT_TYPES),
+    type: 'flight',
   },
   {
-    id: 'f4b62099-293f-4c3d-a702-94eec4a2808e',
-    basePrice: 1100,
+    id: '4',
+    basePrice: getRandomInteger(60, 100),
     dateFrom: '2019-07-10T22:55:56.845Z',
     date: '2019-07-11T11:22:13.375Z',
     destination: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e04',
     favorite: false,
     offers: ['b4c3e4e6-9053-42ce-b747-e281314baa31'],
-    type: getRandomArrayElement(EVENT_TYPES),
+    type: 'bus',
   },
   {
-    id: 'f4b62099-293f-4c3d-a702-94eec4a2808e',
-    basePrice: 1100,
+    id: '5',
+    basePrice: getRandomInteger(500, 1000),
     dateFrom: '2019-07-10T22:55:56.845Z',
     date: '2019-07-11T11:22:13.375Z',
     destination: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e04',
     favorite: false,
-    offers: ['b4c3e4e6-9053-42ce-b747-e281314baa31'],
-    type: getRandomArrayElement(EVENT_TYPES),
+    offers: [],
+    type: 'ship',
   },
 ];
+
+export const getRandomPoints = function () {
+  return getRandomArrayElement(mockPoints);
+};
