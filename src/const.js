@@ -23,4 +23,12 @@ export const POINT_DESCRIPTIONS = [
   'In rutrum ac purus sit amet tempus.',
 ];
 
-export const POINTS_COUNT = 6;
+export const POINTS_COUNT = 4;
+
+export const DATE_FORMAT = {
+  SHORT_DATE: 'MMM DD',
+  FULL_DATE: 'YYYY-MM-DD',
+  ONLY_TIME: 'HH:mm',
+  FULL_DATE_AND_TIME: 'YYYY-MM-DDTHH:mm',
+  CALENDAR_DATE: 'DD/MM/YY',
+};
