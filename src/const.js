@@ -23,8 +23,6 @@ export const POINT_DESCRIPTIONS = [
   'In rutrum ac purus sit amet tempus.',
 ];
 
-export const POINTS_COUNT = 4;
-
 export const DATE_FORMAT = {
   SHORT_DATE: 'MMM DD',
   FULL_DATE: 'YYYY-MM-DD',
@@ -32,3 +30,12 @@ export const DATE_FORMAT = {
   FULL_DATE_AND_TIME: 'YYYY-MM-DDTHH:mm',
   CALENDAR_DATE: 'DD/MM/YY',
 };
+
+export const getDefaultPoint = () => ({
+  basePrice: 0,
+  dateFrom: new Date().toISOString(),
+  dateTo: new Date().toISOString(),
+  destination: 0,
+  isFavorite: false,
+  type: EVENT_TYPES[0],
+});

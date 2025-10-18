@@ -8,11 +8,11 @@ export const mockDestinations = [
     name: 'Chamonix',
     pictures: [
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563105163318',
+        src: 'http://picsum.photos/300/200?r=0.0762563015163318',
         description: getRandomArrayElement(POINT_DESCRIPTIONS),
       },
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563105163318',
+        src: 'http://picsum.photos/300/200?r=0.0762563025163318',
         description: getRandomArrayElement(POINT_DESCRIPTIONS),
       },
     ],
@@ -23,15 +23,15 @@ export const mockDestinations = [
     name: 'Amsterdam',
     pictures: [
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005163347',
+        src: 'http://picsum.photos/300/200?r=0.0762563015163347',
         description: getRandomArrayElement(POINT_DESCRIPTIONS),
       },
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005163347',
+        src: 'http://picsum.photos/300/200?r=0.0762563025163347',
         description: getRandomArrayElement(POINT_DESCRIPTIONS),
       },
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005163347',
+        src: 'http://picsum.photos/300/200?r=0.0762563035163347',
         description: getRandomArrayElement(POINT_DESCRIPTIONS),
       },
     ],
@@ -42,7 +42,7 @@ export const mockDestinations = [
     name: 'Geneva',
     pictures: [
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005169317',
+        src: 'http://picsum.photos/300/200?r=0.0762563015169317',
         description: getRandomArrayElement(POINT_DESCRIPTIONS),
       },
     ],
@@ -53,15 +53,15 @@ export const mockDestinations = [
     name: 'Paris',
     pictures: [
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005168816',
+        src: 'http://picsum.photos/300/200?r=0.0762563015168816',
         description: getRandomArrayElement(POINT_DESCRIPTIONS),
       },
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005168816',
+        src: 'http://picsum.photos/300/200?r=0.0762563025168816',
         description: getRandomArrayElement(POINT_DESCRIPTIONS),
       },
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005168816',
+        src: 'http://picsum.photos/300/200?r=0.0762563035168816',
         description: getRandomArrayElement(POINT_DESCRIPTIONS),
       },
     ],
@@ -72,11 +72,11 @@ export const mockDestinations = [
     name: 'Nice',
     pictures: [
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005167312',
+        src: 'http://picsum.photos/300/200?r=0.0762563015167312',
         description: getRandomArrayElement(POINT_DESCRIPTIONS),
       },
       {
-        src: 'http://picsum.photos/300/200?r=0.0762563005167312',
+        src: 'http://picsum.photos/300/200?r=0.0762563025167312',
         description: getRandomArrayElement(POINT_DESCRIPTIONS),
       },
     ],
