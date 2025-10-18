@@ -4,7 +4,7 @@ function createEditListTemplate() {
   return '<ul class="trip-event__list"></ul>';
 }
 
-export default class EditListView {
+export default class PointsListView {
   getTemplate() {
     return createEditListTemplate();
   }
