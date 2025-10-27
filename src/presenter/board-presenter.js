@@ -8,15 +8,17 @@ export default class BoardPresenter {
   sortingComponent = new SortingView();
   pointsListComponent = new PointsListView();
 
-  constructor({ container, pointModel }) {
+  constructor({ container, pointModel, offerModel, destinationModel }) {
     this.mainContainer = container;
     this.pointModel = pointModel;
+    this.offerModel = offerModel;
+    this.destinationModel = destinationModel;
   }
 
   init() {
     this.points = this.pointModel.getPoints();
-    this.offers = this.pointModel.getOffers();
-    this.destinations = this.pointModel.getDestinations();
+    this.offers = this.offerModel.getOffers();
+    this.destinations = this.destinationModel.getDestinations();
 
     render(this.sortingComponent, this.mainContainer);
     render(this.pointsListComponent, this.mainContainer);
