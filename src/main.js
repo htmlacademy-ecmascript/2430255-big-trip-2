@@ -4,7 +4,7 @@ import FilterView from './view/filter-view.js';
 import PointModel from './model/point-model.js';
 import OfferModel from './model/offer-model.js';
 import DestinationModel from './model/destination-model.js';
-import { render } from './render.js';
+import { render } from './framework/render.js';
 
 const headerElement = document.querySelector('.page-header');
 const filterElement = headerElement.querySelector('.trip-controls__filters');

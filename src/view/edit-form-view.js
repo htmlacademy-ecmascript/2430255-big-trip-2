@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 import { EVENT_TYPES } from '../const.js';
 import { convertDate, capitalizeFirstLetter } from '../utils.js';
 
@@ -192,30 +192,23 @@ function createPointEditFormTemplate(point, offers, destinations) {
   `;
 }
 
-export default class PointEditFormView {
+export default class PointEditFormView extends AbstractView {
+  #point = null;
+  #offers = null;
+  #destinations = null;
+
   constructor({ point, offers, destinations }) {
-    this.point = point;
-    this.offers = offers;
-    this.destinations = destinations;
-    this.element = null;
+    super();
+    this.#point = point;
+    this.#offers = offers;
+    this.#destinations = destinations;
   }
 
-  getTemplate() {
+  get template() {
     return createPointEditFormTemplate(
-      this.point,
-      this.offers,
-      this.destinations
+      this.#point,
+      this.#offers,
+      this.#destinations
     );
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }
