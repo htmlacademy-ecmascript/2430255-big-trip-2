@@ -29,6 +29,9 @@ export const DATE_FORMAT = {
   ONLY_TIME: 'HH:mm',
   FULL_DATE_AND_TIME: 'YYYY-MM-DDTHH:mm',
   CALENDAR_DATE: 'DD/MM/YY',
+  DAY_ONLY: 'D',
+  MONTH_ONLY: 'MMM',
+  TRIP_INFO_DATE: 'D MMM',
 };
 
 export const getDefaultPoint = () => ({
