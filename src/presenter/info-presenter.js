@@ -12,7 +12,7 @@ export default class InfoPresenter {
   }
 
   init() {
-    const points = this.#pointModel.getPoints();
+    const points = this.#pointModel.points;
     this.#tripInfoComponent = new TripInfoView({ points });
     render(this.#tripInfoComponent, this.#container, 'afterbegin');
   }

@@ -1,15 +1,17 @@
 import { mockDestinations } from '../mock/destinations.js';
 
 export default class DestinationModel {
+  #destinations = [];
+
   constructor() {
-    this.destinations = [];
+    this.#destinations = [];
   }
 
   init() {
-    this.destinations = mockDestinations;
+    this.#destinations = mockDestinations;
   }
 
-  getDestinations() {
-    return this.destinations;
+  get destinations() {
+    return this.#destinations;
   }
 }

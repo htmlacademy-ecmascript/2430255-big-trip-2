@@ -23,9 +23,9 @@ export default class BoardPresenter {
   }
 
   init() {
-    this.#points = this.#pointModel.getPoints();
-    this.#offers = this.#offerModel.getOffers();
-    this.#destinations = this.#destinationModel.getDestinations();
+    this.#points = this.#pointModel.points;
+    this.#offers = this.#offerModel.offers;
+    this.#destinations = this.#destinationModel.destinations;
 
     render(this.#sortingComponent, this.#mainContainer);
     render(this.#pointsListComponent, this.#mainContainer);
