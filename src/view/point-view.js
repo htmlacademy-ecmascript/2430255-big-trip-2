@@ -105,9 +105,23 @@ export default class PointView extends AbstractView {
     this.#point = point;
     this.#destinations = destinations;
     this.#offers = offers;
+
+    this._callback = {};
   }
 
   get template() {
     return createPointTemplate(this.#point, this.#offers, this.#destinations);
   }
+
+  setRollupButtonClickHandler(callback) {
+    this._callback.rollupClick = callback;
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#rollupClickHandler);
+  }
+
+  #rollupClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.rollupClick();
+  };
 }

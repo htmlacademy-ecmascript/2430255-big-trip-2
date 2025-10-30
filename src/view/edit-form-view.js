@@ -181,6 +181,9 @@ function createPointEditFormTemplate(point, offers, destinations) {
 
           <button class="event__save-btn btn btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
         </header>
 
         <section class="event__details">
@@ -202,6 +205,8 @@ export default class PointEditFormView extends AbstractView {
     this.#point = point;
     this.#offers = offers;
     this.#destinations = destinations;
+
+    this._callback = {};
   }
 
   get template() {
@@ -210,5 +215,24 @@ export default class PointEditFormView extends AbstractView {
       this.#offers,
       this.#destinations
     );
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.element
+      .querySelector('form')
+      .addEventListener('submit', this.#formSubmitHandler);
+  }
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  };
+
+  setRollupButtonClickHandler(callback) {
+    this._callback.rollupClick = callback;
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this._callback.rollupClick);
   }
 }
