@@ -1,16 +1,22 @@
 import TripInfoView from '../view/trip-info-view.js';
-import { render } from '../render.js';
+import { render } from '../framework/render.js';
 
 export default class InfoPresenter {
-  constructor({ container, pointModel }) {
-    this.container = container;
-    this.pointModel = pointModel;
-    this.tripInfoComponent = null;
+  #container = null;
+  #pointModel = null;
+  #destinationModel = null;
+  #tripInfoComponent = null;
+
+  constructor({ container, pointModel, destinationModel }) {
+    this.#container = container;
+    this.#pointModel = pointModel;
+    this.#destinationModel = destinationModel;
   }
 
   init() {
-    const points = this.pointModel.getPoints();
-    this.tripInfoComponent = new TripInfoView({ points });
-    render(this.tripInfoComponent, this.container, 'afterbegin');
+    const points = this.#pointModel.points;
+    const destinations = this.#destinationModel.destinations;
+    this.#tripInfoComponent = new TripInfoView({ points, destinations });
+    render(this.#tripInfoComponent, this.#container, 'afterbegin');
   }
 }

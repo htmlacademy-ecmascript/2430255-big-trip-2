@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 import { EVENT_TYPES } from '../const.js';
 import { convertDate, capitalizeFirstLetter } from '../utils.js';
 
@@ -181,6 +181,9 @@ function createPointEditFormTemplate(point, offers, destinations) {
 
           <button class="event__save-btn btn btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
         </header>
 
         <section class="event__details">
@@ -192,30 +195,44 @@ function createPointEditFormTemplate(point, offers, destinations) {
   `;
 }
 
-export default class PointEditFormView {
+export default class PointEditFormView extends AbstractView {
+  #point = null;
+  #offers = null;
+  #destinations = null;
+
   constructor({ point, offers, destinations }) {
-    this.point = point;
-    this.offers = offers;
-    this.destinations = destinations;
-    this.element = null;
+    super();
+    this.#point = point;
+    this.#offers = offers;
+    this.#destinations = destinations;
+
+    this._callback = {};
   }
 
-  getTemplate() {
+  get template() {
     return createPointEditFormTemplate(
-      this.point,
-      this.offers,
-      this.destinations
+      this.#point,
+      this.#offers,
+      this.#destinations
     );
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.element
+      .querySelector('form')
+      .addEventListener('submit', this.#formSubmitHandler);
   }
 
-  removeElement() {
-    this.element = null;
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  };
+
+  setRollupButtonClickHandler(callback) {
+    this._callback.rollupClick = callback;
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this._callback.rollupClick);
   }
 }

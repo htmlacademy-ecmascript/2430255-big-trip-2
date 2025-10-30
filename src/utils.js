@@ -42,10 +42,70 @@ const getDuration = (dateFrom, dateTo) => {
 const capitalizeFirstLetter = (word = '') =>
   word ? word[0].toUpperCase() + word.slice(1) : '';
 
+function calculateTotalPrice(points) {
+  return points.reduce((total, point) => {
+    const pointOffersPrice =
+      point.offers?.reduce((sum, offer) => sum + offer.price, 0) || 0;
+    return total + point.basePrice + pointOffersPrice;
+  }, 0);
+}
+
+function getRouteInfo(points, destinations) {
+  if (!points || points.length === 0) {
+    return { title: '', dates: '' };
+  }
+
+  const sortedPoints = [...points].sort(
+    (a, b) => new Date(a.dateFrom) - new Date(b.dateFrom)
+  );
+
+  const destinationNames = [];
+  sortedPoints.forEach((point) => {
+    const destination = destinations.find(
+      (dest) => dest.id === point.destination
+    );
+    const destName = destination ? destination.name : point.destination;
+
+    if (!destinationNames.includes(destName)) {
+      destinationNames.push(destName);
+    }
+  });
+
+  let title = '';
+  if (destinationNames.length <= 3) {
+    title = destinationNames.join(' &mdash; ');
+  } else {
+    title = `${destinationNames[0]} &mdash; ... &mdash; ${
+      destinationNames[destinationNames.length - 1]
+    }`;
+  }
+
+  const startDate = sortedPoints[0].dateFrom;
+  const endDate = sortedPoints[sortedPoints.length - 1].dateTo;
+
+  const startDay = convertDate(startDate, 'DAY_ONLY');
+  const startMonth = convertDate(startDate, 'MONTH_ONLY');
+  const endDay = convertDate(endDate, 'DAY_ONLY');
+
+  let dates;
+  if (
+    convertDate(startDate, 'MONTH_ONLY') === convertDate(endDate, 'MONTH_ONLY')
+  ) {
+    dates = `${startDay}&nbsp;&mdash;&nbsp;${endDay} ${startMonth}`;
+  } else {
+    const endMonth = convertDate(endDate, 'MONTH_ONLY');
+    dates = `${startDay} ${startMonth}&nbsp;&mdash;&nbsp;${endDay} ${endMonth}`;
+  }
+
+  return { title, dates };
+}
+
 export {
   getRandomInteger,
   getRandomArrayElement,
   convertDate,
   getDuration,
   capitalizeFirstLetter,
+  calculateTotalPrice,
+  getRouteInfo,
 };
