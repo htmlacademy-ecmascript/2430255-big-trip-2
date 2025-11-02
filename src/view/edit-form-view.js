@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view';
 import { EVENT_TYPES } from '../const.js';
-import { convertDate, capitalizeFirstLetter } from '../utils.js';
+import { convertDate, capitalizeFirstLetter } from '../utils/utils.js';
 
 function createOffersTemplate(point, allOffersByType) {
   if (!allOffersByType || !allOffersByType.offers.length) {
@@ -205,7 +205,6 @@ export default class PointEditFormView extends AbstractView {
     this.#point = point;
     this.#offers = offers;
     this.#destinations = destinations;
-
     this._callback = {};
   }
 
