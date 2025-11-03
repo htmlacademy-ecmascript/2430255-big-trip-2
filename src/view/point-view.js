@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { convertDate, getDuration } from '../utils.js';
+import { convertDate, getDuration } from '../utils/utils.js';
 
 function createPointTemplate(point, offers, destinations) {
   const { basePrice, dateFrom, dateTo, destination, isFavorite, type } = point;
@@ -105,7 +105,6 @@ export default class PointView extends AbstractView {
     this.#point = point;
     this.#destinations = destinations;
     this.#offers = offers;
-
     this._callback = {};
   }
 

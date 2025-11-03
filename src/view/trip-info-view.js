@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { calculateTotalPrice, getRouteInfo } from '../utils.js';
+import { calculateTotalPrice, getRouteInfo } from '../utils/utils.js';
 
 function createTripInfoTemplate(points, destinations) {
   if (!points || points.length === 0) {

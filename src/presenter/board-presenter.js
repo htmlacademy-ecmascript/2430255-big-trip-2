@@ -1,8 +1,12 @@
-import { render } from '../framework/render.js';
+import { render, replace } from '../framework/render.js';
+import { isEscapeKey } from '../utils/utils.js';
 import PointEditFormView from '../view/edit-form-view.js';
 import PointsListView from '../view/points-list-view.js';
 import PointView from '../view/point-view.js';
 import SortingView from '../view/sorting-view.js';
+import FilterView from '../view/filter-view.js';
+import { FilterType } from '../const.js';
+import { filter } from '../utils/filter.js';
 
 export default class BoardPresenter {
   #sortingComponent = new SortingView();
@@ -11,9 +15,12 @@ export default class BoardPresenter {
   #pointModel = null;
   #offerModel = null;
   #destinationModel = null;
-  #points = null;
-  #offers = null;
-  #destinations = null;
+  #filterComponent = null;
+
+  #points = [];
+  #offers = [];
+  #destinations = [];
+  #currentFilter = FilterType.EVERYTHING;
 
   constructor({ container, pointModel, offerModel, destinationModel }) {
     this.#mainContainer = container;
@@ -27,27 +34,64 @@ export default class BoardPresenter {
     this.#offers = this.#offerModel.offers;
     this.#destinations = this.#destinationModel.destinations;
 
-    render(this.#sortingComponent, this.#mainContainer);
-    render(this.#pointsListComponent, this.#mainContainer);
+    this.#renderApp();
+  }
 
-    if (!this.#points.length) {
+  #renderApp() {
+    this.#renderFilter();
+    this.#renderSorting();
+    this.#renderPointsList();
+    this.#renderPoints();
+  }
+
+  #renderFilter() {
+    const filters = Object.values(FilterType).map((type) => ({
+      type,
+      hasPoints: filter[type](this.#points).length > 0,
+    }));
+
+    this.#filterComponent = new FilterView({
+      filters,
+      currentFilterType: this.#currentFilter,
+      onFilterChange: this.#handleFilterChange,
+    });
+
+    const headerElement = document.querySelector('.trip-controls__filters');
+    render(this.#filterComponent, headerElement);
+  }
+
+  #handleFilterChange = (filterType) => {
+    if (this.#currentFilter === filterType) {
+      return;
+    }
+    this.#currentFilter = filterType;
+    this.#clearPoints();
+    this.#renderPoints();
+  };
+
+  #clearPoints() {
+    this.#pointsListComponent.element.innerHTML = '';
+  }
+
+  #renderSorting() {
+    render(this.#sortingComponent, this.#mainContainer);
+  }
+
+  #renderPointsList() {
+    render(this.#pointsListComponent, this.#mainContainer);
+  }
+
+  #renderPoints() {
+    const filteredPoints = filter[this.#currentFilter](this.#points);
+
+    if (!filteredPoints.length) {
+      this.#pointsListComponent.element.innerHTML = `<p class="trip-events__msg">There are no ${
+        this.#currentFilter
+      } events now</p>`;
       return;
     }
 
-    // this.#renderPointEdit(this.#points[0]);
-    // this.#points.slice(1).forEach((point) => this.#renderPoint(point));
-    this.#points.forEach((point) => this.#renderPoint(point));
-  }
-
-  #renderPointEdit(point) {
-    render(
-      new PointEditFormView({
-        point,
-        offers: this.#offers,
-        destinations: this.#destinations,
-      }),
-      this.#pointsListComponent.element
-    );
+    filteredPoints.forEach((point) => this.#renderPoint(point));
   }
 
   #renderPoint(point) {
@@ -63,42 +107,26 @@ export default class BoardPresenter {
       destinations: this.#destinations,
     });
 
-    const replacePointToForm = () => {
-      this.#pointsListComponent.element.replaceChild(
-        pointEditComponent.element,
-        pointComponent.element
-      );
-
-      document.addEventListener('keydown', onEscKeyDown);
-    };
-
-    const replaceFormToPoint = () => {
-      this.#pointsListComponent.element.replaceChild(
-        pointComponent.element,
-        pointEditComponent.element
-      );
-
-      document.removeEventListener('keydown', onEscKeyDown);
-    };
-
-    function onEscKeyDown(evt) {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
+    const onEscKeyDown = (evt) => {
+      if (isEscapeKey(evt)) {
         evt.preventDefault();
         replaceFormToPoint();
       }
+    };
+
+    function replacePointToForm() {
+      replace(pointEditComponent, pointComponent);
+      document.addEventListener('keydown', onEscKeyDown);
     }
 
-    pointComponent.setRollupButtonClickHandler(() => {
-      replacePointToForm();
-    });
+    function replaceFormToPoint() {
+      replace(pointComponent, pointEditComponent);
+      document.removeEventListener('keydown', onEscKeyDown);
+    }
 
-    pointEditComponent.setFormSubmitHandler(() => {
-      replaceFormToPoint();
-    });
-
-    pointEditComponent.setRollupButtonClickHandler(() => {
-      replaceFormToPoint();
-    });
+    pointComponent.setRollupButtonClickHandler(replacePointToForm);
+    pointEditComponent.setFormSubmitHandler(replaceFormToPoint);
+    pointEditComponent.setRollupButtonClickHandler(replaceFormToPoint);
 
     render(pointComponent, this.#pointsListComponent.element);
   }

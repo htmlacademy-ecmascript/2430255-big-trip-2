@@ -34,11 +34,9 @@ export const DATE_FORMAT = {
   TRIP_INFO_DATE: 'D MMM',
 };
 
-export const getDefaultPoint = () => ({
-  basePrice: 0,
-  dateFrom: new Date().toISOString(),
-  dateTo: new Date().toISOString(),
-  destination: 0,
-  isFavorite: false,
-  type: EVENT_TYPES[0],
-});
+export const FilterType = {
+  EVERYTHING: 'everything',
+  PAST: 'past',
+  PRESENT: 'present',
+  FUTURE: 'future',
+};

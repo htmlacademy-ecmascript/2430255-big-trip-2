@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import duration from 'dayjs/plugin/duration';
-import { DATE_FORMAT } from './const';
+import { DATE_FORMAT } from '../const';
 
 dayjs.extend(utc);
 dayjs.extend(duration);
+
+const isEscapeKey = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
 const getRandomInteger = (a, b) => {
   const lower = Math.ceil(Math.min(a, b));
@@ -42,15 +44,14 @@ const getDuration = (dateFrom, dateTo) => {
 const capitalizeFirstLetter = (word = '') =>
   word ? word[0].toUpperCase() + word.slice(1) : '';
 
-function calculateTotalPrice(points) {
-  return points.reduce((total, point) => {
+const calculateTotalPrice = (points) =>
+  points.reduce((total, point) => {
     const pointOffersPrice =
       point.offers?.reduce((sum, offer) => sum + offer.price, 0) || 0;
     return total + point.basePrice + pointOffersPrice;
   }, 0);
-}
 
-function getRouteInfo(points, destinations) {
+const getRouteInfo = (points, destinations) => {
   if (!points || points.length === 0) {
     return { title: '', dates: '' };
   }
@@ -98,9 +99,10 @@ function getRouteInfo(points, destinations) {
   }
 
   return { title, dates };
-}
+};
 
 export {
+  isEscapeKey,
   getRandomInteger,
   getRandomArrayElement,
   convertDate,
