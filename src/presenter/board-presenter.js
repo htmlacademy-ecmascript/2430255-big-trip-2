@@ -4,6 +4,7 @@ import SortingView from '../view/sorting-view.js';
 import FilterView from '../view/filter-view.js';
 import { FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
+import { updateItem } from '../utils/common.js';
 import PointPresenter from './point-presenter.js';
 
 export default class BoardPresenter {
@@ -37,6 +38,11 @@ export default class BoardPresenter {
 
     this.#renderApp();
   }
+
+  #handlePointChange = (updatedPoint) => {
+    this.#points = updateItem(this.#points, updatedPoint);
+    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
+  };
 
   #renderApp() {
     this.#renderFilter();
@@ -103,6 +109,7 @@ export default class BoardPresenter {
       container: this.#pointsListComponent.element,
       offers: this.#offers,
       destinations: this.#destinations,
+      onDataChange: this.#handlePointChange,
     });
     presenter.init(point);
     this.#pointPresenters.set(point.id, presenter);

@@ -1,8 +1,8 @@
-import { getRandomInteger } from '../utils/utils';
+import { getRandomInteger } from '../utils/common';
 
 export const mockPoints = [
   {
-    id: '1',
+    id: '2',
     basePrice: getRandomInteger(40, 60),
     dateFrom: '2025-11-03T11:05:00.845Z',
     dateTo: '2025-11-03T11:21:13.375Z',
@@ -12,7 +12,7 @@ export const mockPoints = [
     type: 'taxi',
   },
   {
-    id: '2',
+    id: '1',
     basePrice: getRandomInteger(100, 110),
     dateFrom: '2025-11-03T12:20:00.845Z',
     dateTo: '2025-11-03T15:40:13.375Z',

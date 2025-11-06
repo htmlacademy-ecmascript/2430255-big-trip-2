@@ -1,5 +1,5 @@
 import { POINT_DESCRIPTIONS } from '../const';
-import { getRandomArrayElement } from '../utils/utils';
+import { getRandomArrayElement } from '../utils/common';
 
 export const mockDestinations = [
   {

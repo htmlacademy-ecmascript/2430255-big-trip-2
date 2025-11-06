@@ -1,8 +1,7 @@
-// presenter/point-presenter.js
 import { render, replace, remove } from '../framework/render.js';
 import PointView from '../view/point-view.js';
 import PointEditFormView from '../view/edit-form-view.js';
-import { isEscapeKey } from '../utils/utils.js';
+import { isEscapeKey } from '../utils/common.js';
 
 export default class PointPresenter {
   #container = null;
@@ -12,11 +11,13 @@ export default class PointPresenter {
 
   #pointComponent = null;
   #pointEditComponent = null;
+  #handleDataChange = null;
 
-  constructor({ container, offers, destinations }) {
+  constructor({ container, offers, destinations, onDataChange }) {
     this.#container = container;
     this.#offers = offers;
     this.#destinations = destinations;
+    this.#handleDataChange = onDataChange;
   }
 
   init(point) {
@@ -35,6 +36,7 @@ export default class PointPresenter {
       point: this.#point,
       offers: this.#offers,
       destinations: this.#destinations,
+      onFormSubmit: this.#handleFormSubmit,
     });
 
     this.#pointComponent.setRollupButtonClickHandler(() =>
@@ -56,6 +58,11 @@ export default class PointPresenter {
     remove(prevPointComponent);
     remove(prevEditComponent);
   }
+
+  #handleFormSubmit = (updatedPoint) => {
+    this.#handleDataChange(updatedPoint);
+    this.#replaceFormToPoint();
+  };
 
   #replacePointToForm() {
     replace(this.#pointEditComponent, this.#pointComponent);

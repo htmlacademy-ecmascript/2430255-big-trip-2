@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view';
 import { EVENT_TYPES } from '../const.js';
-import { convertDate, capitalizeFirstLetter } from '../utils/utils.js';
+import { convertDate, capitalizeFirstLetter } from '../utils/common.js';
 
 function createOffersTemplate(point, allOffersByType) {
   if (!allOffersByType || !allOffersByType.offers.length) {

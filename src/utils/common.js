@@ -101,6 +101,10 @@ const getRouteInfo = (points, destinations) => {
   return { title, dates };
 };
 
+const updateItem = function (items, update) {
+  return items.map((item) => (item.id === update.id ? update : item));
+};
+
 export {
   isEscapeKey,
   getRandomInteger,
@@ -110,4 +114,5 @@ export {
   capitalizeFirstLetter,
   calculateTotalPrice,
   getRouteInfo,
+  updateItem,
 };
