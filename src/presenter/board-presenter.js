@@ -1,26 +1,27 @@
-import { render, replace } from '../framework/render.js';
-import { isEscapeKey } from '../utils/utils.js';
-import PointEditFormView from '../view/edit-form-view.js';
+import { render } from '../framework/render.js';
 import PointsListView from '../view/points-list-view.js';
-import PointView from '../view/point-view.js';
 import SortingView from '../view/sorting-view.js';
 import FilterView from '../view/filter-view.js';
 import { FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
+import PointPresenter from './point-presenter.js';
 
 export default class BoardPresenter {
-  #sortingComponent = new SortingView();
-  #pointsListComponent = new PointsListView();
   #mainContainer = null;
   #pointModel = null;
   #offerModel = null;
   #destinationModel = null;
+
+  #sortingComponent = new SortingView();
+  #pointsListComponent = new PointsListView();
   #filterComponent = null;
 
   #points = [];
   #offers = [];
   #destinations = [];
   #currentFilter = FilterType.EVERYTHING;
+
+  #pointPresenters = new Map();
 
   constructor({ container, pointModel, offerModel, destinationModel }) {
     this.#mainContainer = container;
@@ -70,6 +71,8 @@ export default class BoardPresenter {
   };
 
   #clearPoints() {
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointPresenters.clear();
     this.#pointsListComponent.element.innerHTML = '';
   }
 
@@ -85,9 +88,10 @@ export default class BoardPresenter {
     const filteredPoints = filter[this.#currentFilter](this.#points);
 
     if (!filteredPoints.length) {
-      this.#pointsListComponent.element.innerHTML = `<p class="trip-events__msg">There are no ${
-        this.#currentFilter
-      } events now</p>`;
+      this.#pointsListComponent.element.innerHTML = `
+        <p class="trip-events__msg">
+          There are no ${this.#currentFilter} events now
+        </p>`;
       return;
     }
 
@@ -95,39 +99,12 @@ export default class BoardPresenter {
   }
 
   #renderPoint(point) {
-    const pointComponent = new PointView({
-      point,
+    const presenter = new PointPresenter({
+      container: this.#pointsListComponent.element,
       offers: this.#offers,
       destinations: this.#destinations,
     });
-
-    const pointEditComponent = new PointEditFormView({
-      point,
-      offers: this.#offers,
-      destinations: this.#destinations,
-    });
-
-    const onEscKeyDown = (evt) => {
-      if (isEscapeKey(evt)) {
-        evt.preventDefault();
-        replaceFormToPoint();
-      }
-    };
-
-    function replacePointToForm() {
-      replace(pointEditComponent, pointComponent);
-      document.addEventListener('keydown', onEscKeyDown);
-    }
-
-    function replaceFormToPoint() {
-      replace(pointComponent, pointEditComponent);
-      document.removeEventListener('keydown', onEscKeyDown);
-    }
-
-    pointComponent.setRollupButtonClickHandler(replacePointToForm);
-    pointEditComponent.setFormSubmitHandler(replaceFormToPoint);
-    pointEditComponent.setRollupButtonClickHandler(replaceFormToPoint);
-
-    render(pointComponent, this.#pointsListComponent.element);
+    presenter.init(point);
+    this.#pointPresenters.set(point.id, presenter);
   }
 }
