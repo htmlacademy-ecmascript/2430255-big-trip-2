@@ -48,6 +48,7 @@ export default class PointPresenter {
     this.#pointEditComponent.setRollupButtonClickHandler(() =>
       this.#replaceFormToPoint()
     );
+    this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
 
     if (!prevPointComponent || !prevEditComponent) {
       render(this.#pointComponent, this.#container);
@@ -62,6 +63,13 @@ export default class PointPresenter {
   #handleFormSubmit = (updatedPoint) => {
     this.#handleDataChange(updatedPoint);
     this.#replaceFormToPoint();
+  };
+
+  #handleFavoriteClick = () => {
+    this.#handleDataChange({
+      ...this.#point,
+      isFavorite: !this.#point.isFavorite,
+    });
   };
 
   #replacePointToForm() {

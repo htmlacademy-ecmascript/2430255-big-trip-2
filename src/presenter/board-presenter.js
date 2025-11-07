@@ -41,7 +41,10 @@ export default class BoardPresenter {
 
   #handlePointChange = (updatedPoint) => {
     this.#points = updateItem(this.#points, updatedPoint);
-    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
+    const presenter = this.#pointPresenters.get(updatedPoint.id);
+    if (presenter) {
+      presenter.init(updatedPoint);
+    }
   };
 
   #renderApp() {
@@ -79,7 +82,6 @@ export default class BoardPresenter {
   #clearPoints() {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
-    this.#pointsListComponent.element.innerHTML = '';
   }
 
   #renderSorting() {
