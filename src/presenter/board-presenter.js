@@ -39,6 +39,10 @@ export default class BoardPresenter {
     this.#renderApp();
   }
 
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
   #handlePointChange = (updatedPoint) => {
     this.#points = updateItem(this.#points, updatedPoint);
     const presenter = this.#pointPresenters.get(updatedPoint.id);
@@ -46,6 +50,20 @@ export default class BoardPresenter {
       presenter.init(updatedPoint);
     }
   };
+
+  #handleFilterChange = (filterType) => {
+    if (this.#currentFilter === filterType) {
+      return;
+    }
+    this.#currentFilter = filterType;
+    this.#clearPoints();
+    this.#renderPoints();
+  };
+
+  #clearPoints() {
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointPresenters.clear();
+  }
 
   #renderApp() {
     this.#renderFilter();
@@ -68,20 +86,6 @@ export default class BoardPresenter {
 
     const headerElement = document.querySelector('.trip-controls__filters');
     render(this.#filterComponent, headerElement);
-  }
-
-  #handleFilterChange = (filterType) => {
-    if (this.#currentFilter === filterType) {
-      return;
-    }
-    this.#currentFilter = filterType;
-    this.#clearPoints();
-    this.#renderPoints();
-  };
-
-  #clearPoints() {
-    this.#pointPresenters.forEach((presenter) => presenter.destroy());
-    this.#pointPresenters.clear();
   }
 
   #renderSorting() {
@@ -112,7 +116,9 @@ export default class BoardPresenter {
       offers: this.#offers,
       destinations: this.#destinations,
       onDataChange: this.#handlePointChange,
+      onModeChange: this.#handleModeChange,
     });
+
     presenter.init(point);
     this.#pointPresenters.set(point.id, presenter);
   }
