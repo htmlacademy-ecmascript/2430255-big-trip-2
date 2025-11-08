@@ -1,21 +1,21 @@
-import { getRandomInteger } from '../utils/utils';
+import { getRandomInteger } from '../utils/common';
 
 export const mockPoints = [
   {
-    id: '1',
+    id: '2',
     basePrice: getRandomInteger(40, 60),
-    dateFrom: '2025-07-10T11:05:00.845Z',
-    dateTo: '2025-07-10T11:21:13.375Z',
+    dateFrom: '2025-11-03T11:05:00.845Z',
+    dateTo: '2025-11-03T11:21:13.375Z',
     destination: '2',
     isFavorite: false,
     offers: ['2'],
     type: 'taxi',
   },
   {
-    id: '2',
+    id: '1',
     basePrice: getRandomInteger(100, 110),
-    dateFrom: '2025-07-10T12:20:00.845Z',
-    dateTo: '2025-07-10T15:40:13.375Z',
+    dateFrom: '2025-11-03T12:20:00.845Z',
+    dateTo: '2025-11-03T15:40:13.375Z',
     destination: '4',
     isFavorite: false,
     offers: ['2', '4'],
@@ -24,8 +24,8 @@ export const mockPoints = [
   {
     id: '3',
     basePrice: getRandomInteger(10, 30),
-    dateFrom: '2025-07-10T15:45:00.845Z',
-    dateTo: '2025-07-10T15:53:13.375Z',
+    dateFrom: '2025-11-06T15:45:00.845Z',
+    dateTo: '2025-11-06T15:53:13.375Z',
     destination: '4',
     isFavorite: false,
     offers: [],
@@ -34,8 +34,8 @@ export const mockPoints = [
   {
     id: '4',
     basePrice: getRandomInteger(60, 90),
-    dateFrom: '2025-07-11T09:10:00.845Z',
-    dateTo: '2025-07-11T17:05:00.375Z',
+    dateFrom: '2025-11-06T09:10:00.845Z',
+    dateTo: '2025-11-06T17:05:00.375Z',
     destination: '1',
     isFavorite: false,
     offers: ['1', '3'],
@@ -44,8 +44,8 @@ export const mockPoints = [
   {
     id: '5',
     basePrice: getRandomInteger(800, 1100),
-    dateFrom: '2025-07-11T22:55:56.845Z',
-    dateTo: '2025-07-20T11:00:00.375Z',
+    dateFrom: '2025-11-06T22:55:56.845Z',
+    dateTo: '2025-11-15T11:00:00.375Z',
     destination: '1',
     isFavorite: true,
     offers: [],

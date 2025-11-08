@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import { convertDate, getDuration } from '../utils/utils.js';
+import { convertDate, getDuration } from '../utils/common.js';
 
 function createPointTemplate(point, offers, destinations) {
   const { basePrice, dateFrom, dateTo, destination, isFavorite, type } = point;
@@ -118,6 +118,18 @@ export default class PointView extends AbstractView {
       .querySelector('.event__rollup-btn')
       .addEventListener('click', this.#rollupClickHandler);
   }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.element
+      .querySelector('.event__favorite-btn')
+      .addEventListener('click', this.#favoriteClickHandler);
+  }
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  };
 
   #rollupClickHandler = (evt) => {
     evt.preventDefault();
