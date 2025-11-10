@@ -41,6 +41,9 @@ const getDuration = (dateFrom, dateTo) => {
   return parts.join(' ');
 };
 
+const getEventDuration = (point) =>
+  dayjs(point.dateTo).diff(dayjs(point.dateFrom));
+
 const capitalizeFirstLetter = (word = '') =>
   word ? word[0].toUpperCase() + word.slice(1) : '';
 
@@ -111,6 +114,7 @@ export {
   getRandomArrayElement,
   convertDate,
   getDuration,
+  getEventDuration,
   capitalizeFirstLetter,
   calculateTotalPrice,
   getRouteInfo,

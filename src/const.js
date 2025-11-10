@@ -40,3 +40,9 @@ export const FilterType = {
   PRESENT: 'present',
   FUTURE: 'future',
 };
+
+export const SortType = {
+  DAY: 'day',
+  TIME: 'time',
+  PRICE: 'price',
+};
