@@ -1,4 +1,4 @@
-import { render } from '../framework/render.js';
+import { render, replace } from '../framework/render.js';
 import PointsListView from '../view/points-list-view.js';
 import SortingView from '../view/sorting-view.js';
 import FilterView from '../view/filter-view.js';
@@ -57,8 +57,12 @@ export default class BoardPresenter {
     if (this.#currentFilter === filterType) {
       return;
     }
+
     this.#currentFilter = filterType;
+    this.#currentSortType = SortType.DAY;
+
     this.#clearPoints();
+    this.#renderSorting();
     this.#renderPoints();
   };
 
@@ -71,17 +75,6 @@ export default class BoardPresenter {
     this.#clearPoints();
     this.#renderPoints();
   };
-
-  #getSortedPoints(points) {
-    switch (this.#currentSortType) {
-      case SortType.TIME:
-        return [...points].sort(sortByTime);
-      case SortType.PRICE:
-        return [...points].sort(sortByPrice);
-      default:
-        return [...points].sort(sortByDay);
-    }
-  }
 
   #clearPoints() {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
@@ -111,12 +104,31 @@ export default class BoardPresenter {
     render(this.#filterComponent, headerElement);
   }
 
+  #getSortedPoints(points) {
+    switch (this.#currentSortType) {
+      case SortType.TIME:
+        return [...points].sort(sortByTime);
+      case SortType.PRICE:
+        return [...points].sort(sortByPrice);
+      default:
+        return [...points].sort(sortByDay);
+    }
+  }
+
   #renderSorting() {
+    const prevSortingComponent = this.#sortingComponent;
+
     this.#sortingComponent = new SortingView({
       currentSortType: this.#currentSortType,
       onSortTypeChange: this.#handleSortTypeChange,
     });
-    render(this.#sortingComponent, this.#mainContainer);
+
+    if (prevSortingComponent === null) {
+      render(this.#sortingComponent, this.#mainContainer);
+      return;
+    }
+
+    replace(this.#sortingComponent, prevSortingComponent);
   }
 
   #renderPointsList() {
@@ -129,9 +141,9 @@ export default class BoardPresenter {
 
     if (!sortedPoints.length) {
       this.#pointsListComponent.element.innerHTML = `
-      <p class="trip-events__msg">
-        There are no ${this.#currentFilter} events now
-      </p>`;
+        <p class="trip-events__msg">
+          There are no ${this.#currentFilter} events now
+        </p>`;
       return;
     }
 
