@@ -24,8 +24,8 @@ export const mockPoints = [
   {
     id: '3',
     basePrice: getRandomInteger(10, 30),
-    dateFrom: '2025-11-06T15:45:00.845Z',
-    dateTo: '2025-11-06T15:53:13.375Z',
+    dateFrom: '2025-11-05T15:45:00.845Z',
+    dateTo: '2025-11-05T15:53:13.375Z',
     destination: '4',
     isFavorite: false,
     offers: [],
@@ -44,8 +44,8 @@ export const mockPoints = [
   {
     id: '5',
     basePrice: getRandomInteger(800, 1100),
-    dateFrom: '2025-11-06T22:55:56.845Z',
-    dateTo: '2025-11-15T11:00:00.375Z',
+    dateFrom: '2025-11-07T22:55:56.845Z',
+    dateTo: '2025-11-16T11:00:00.375Z',
     destination: '1',
     isFavorite: true,
     offers: [],

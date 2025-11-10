@@ -1,9 +1,10 @@
-import { render } from '../framework/render.js';
+import { render, replace } from '../framework/render.js';
 import PointsListView from '../view/points-list-view.js';
 import SortingView from '../view/sorting-view.js';
 import FilterView from '../view/filter-view.js';
-import { FilterType } from '../const.js';
+import { FilterType, SortType } from '../const.js';
 import { filter } from '../utils/filter.js';
+import { sortByDay, sortByTime, sortByPrice } from '../utils/sort.js';
 import { updateItem } from '../utils/common.js';
 import PointPresenter from './point-presenter.js';
 
@@ -13,7 +14,7 @@ export default class BoardPresenter {
   #offerModel = null;
   #destinationModel = null;
 
-  #sortingComponent = new SortingView();
+  #sortingComponent = null;
   #pointsListComponent = new PointsListView();
   #filterComponent = null;
 
@@ -21,6 +22,7 @@ export default class BoardPresenter {
   #offers = [];
   #destinations = [];
   #currentFilter = FilterType.EVERYTHING;
+  #currentSortType = SortType.DAY;
 
   #pointPresenters = new Map();
 
@@ -55,7 +57,21 @@ export default class BoardPresenter {
     if (this.#currentFilter === filterType) {
       return;
     }
+
     this.#currentFilter = filterType;
+    this.#currentSortType = SortType.DAY;
+
+    this.#clearPoints();
+    this.#renderSorting();
+    this.#renderPoints();
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#currentSortType = sortType;
     this.#clearPoints();
     this.#renderPoints();
   };
@@ -88,8 +104,31 @@ export default class BoardPresenter {
     render(this.#filterComponent, headerElement);
   }
 
+  #getSortedPoints(points) {
+    switch (this.#currentSortType) {
+      case SortType.TIME:
+        return [...points].sort(sortByTime);
+      case SortType.PRICE:
+        return [...points].sort(sortByPrice);
+      default:
+        return [...points].sort(sortByDay);
+    }
+  }
+
   #renderSorting() {
-    render(this.#sortingComponent, this.#mainContainer);
+    const prevSortingComponent = this.#sortingComponent;
+
+    this.#sortingComponent = new SortingView({
+      currentSortType: this.#currentSortType,
+      onSortTypeChange: this.#handleSortTypeChange,
+    });
+
+    if (prevSortingComponent === null) {
+      render(this.#sortingComponent, this.#mainContainer);
+      return;
+    }
+
+    replace(this.#sortingComponent, prevSortingComponent);
   }
 
   #renderPointsList() {
@@ -98,8 +137,9 @@ export default class BoardPresenter {
 
   #renderPoints() {
     const filteredPoints = filter[this.#currentFilter](this.#points);
+    const sortedPoints = this.#getSortedPoints(filteredPoints);
 
-    if (!filteredPoints.length) {
+    if (!sortedPoints.length) {
       this.#pointsListComponent.element.innerHTML = `
         <p class="trip-events__msg">
           There are no ${this.#currentFilter} events now
@@ -107,7 +147,7 @@ export default class BoardPresenter {
       return;
     }
 
-    filteredPoints.forEach((point) => this.#renderPoint(point));
+    sortedPoints.forEach((point) => this.#renderPoint(point));
   }
 
   #renderPoint(point) {
