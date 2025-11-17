@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { EVENT_TYPES } from '../const.js';
 import { convertDate, capitalizeFirstLetter } from '../utils/common.js';
 
@@ -195,26 +195,28 @@ function createPointEditFormTemplate(point, offers, destinations) {
   `;
 }
 
-export default class PointEditFormView extends AbstractView {
-  #point = null;
+export default class PointEditFormView extends AbstractStatefulView {
   #offers = null;
   #destinations = null;
 
   constructor({ point, offers, destinations }) {
     super();
-    this.#point = point;
+    this._state = structuredClone(point);
     this.#offers = offers;
     this.#destinations = destinations;
+
     this._callback = {};
   }
 
   get template() {
     return createPointEditFormTemplate(
-      this.#point,
+      this._state,
       this.#offers,
       this.#destinations
     );
   }
+
+  _restoreHandlers() {}
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
