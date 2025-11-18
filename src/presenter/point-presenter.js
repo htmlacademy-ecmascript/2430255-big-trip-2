@@ -41,6 +41,8 @@ export default class PointPresenter {
       onFormSubmit: this.#handleFormSubmit,
     });
 
+    this.#pointEditComponent._restoreHandlers();
+
     this.#pointComponent.setRollupButtonClickHandler(() =>
       this.#replacePointToForm()
     );
