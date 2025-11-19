@@ -216,6 +216,10 @@ export default class PointEditFormView extends AbstractStatefulView {
     );
   }
 
+  reset(point) {
+    this.updateElement(structuredClone(point));
+  }
+
   _restoreHandlers() {
     this.element
       .querySelector('.event__type-group')
@@ -300,23 +304,23 @@ export default class PointEditFormView extends AbstractStatefulView {
       newOffers = this._state.offers.filter((id) => id !== offerId);
     }
 
-    this.updateElement({ offers: newOffers });
+    this._setState({ offers: newOffers });
   };
 
   #priceInputHandler = (evt) => {
-    this.updateElement({
+    this._setState({
       basePrice: Number(evt.target.value),
     });
   };
 
   #startDateChangeHandler = (evt) => {
-    this.updateElement({
+    this._setState({
       dateFrom: new Date(evt.target.value),
     });
   };
 
   #endDateChangeHandler = (evt) => {
-    this.updateElement({
+    this._setState({
       dateTo: new Date(evt.target.value),
     });
   };
