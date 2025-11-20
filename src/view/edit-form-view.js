@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { EVENT_TYPES } from '../const.js';
 import { convertDate, capitalizeFirstLetter } from '../utils/common.js';
 
@@ -195,25 +195,61 @@ function createPointEditFormTemplate(point, offers, destinations) {
   `;
 }
 
-export default class PointEditFormView extends AbstractView {
-  #point = null;
+export default class PointEditFormView extends AbstractStatefulView {
   #offers = null;
   #destinations = null;
 
   constructor({ point, offers, destinations }) {
     super();
-    this.#point = point;
+    this._state = structuredClone(point);
     this.#offers = offers;
     this.#destinations = destinations;
+
     this._callback = {};
   }
 
   get template() {
     return createPointEditFormTemplate(
-      this.#point,
+      this._state,
       this.#offers,
       this.#destinations
     );
+  }
+
+  reset(point) {
+    this.updateElement(structuredClone(point));
+  }
+
+  _restoreHandlers() {
+    this.element
+      .querySelector('.event__type-group')
+      .addEventListener('change', this.#eventTypeChangeHandler);
+
+    this.element
+      .querySelector('.event__input--destination')
+      .addEventListener('change', this.#destinationInputHandler);
+
+    this.element
+      .querySelector('#event-start-time-1')
+      .addEventListener('change', this.#startDateChangeHandler);
+
+    this.element
+      .querySelector('#event-end-time-1')
+      .addEventListener('change', this.#endDateChangeHandler);
+
+    this.element
+      .querySelector('#event-price-1')
+      .addEventListener('input', this.#priceInputHandler);
+
+    this.element
+      .querySelectorAll('.event__offer-checkbox')
+      .forEach((checkbox) =>
+        checkbox.addEventListener('change', this.#offerToggleHandler)
+      );
+
+    this.setFormSubmitHandler(this._callback.formSubmit);
+
+    this.setRollupButtonClickHandler(this._callback.rollupClick);
   }
 
   setFormSubmitHandler(callback) {
@@ -223,15 +259,74 @@ export default class PointEditFormView extends AbstractView {
       .addEventListener('submit', this.#formSubmitHandler);
   }
 
-  #formSubmitHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.formSubmit();
-  };
-
   setRollupButtonClickHandler(callback) {
     this._callback.rollupClick = callback;
     this.element
       .querySelector('.event__rollup-btn')
       .addEventListener('click', this._callback.rollupClick);
   }
+
+  #eventTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    const newType = evt.target.value;
+
+    this.updateElement({
+      type: newType,
+      offers: [],
+    });
+  };
+
+  #destinationInputHandler = (evt) => {
+    evt.preventDefault();
+    const value = evt.target.value;
+
+    const selectedDestination = this.#destinations.find(
+      (dest) => dest.name === value
+    );
+
+    if (!selectedDestination) {
+      return;
+    }
+
+    this.updateElement({
+      destination: selectedDestination.id,
+    });
+  };
+
+  #offerToggleHandler = (evt) => {
+    const offerId = Number(evt.target.id.replace('event-offer-', ''));
+
+    let newOffers = [];
+
+    if (evt.target.checked) {
+      newOffers = [...this._state.offers, offerId];
+    } else {
+      newOffers = this._state.offers.filter((id) => id !== offerId);
+    }
+
+    this._setState({ offers: newOffers });
+  };
+
+  #priceInputHandler = (evt) => {
+    this._setState({
+      basePrice: Number(evt.target.value),
+    });
+  };
+
+  #startDateChangeHandler = (evt) => {
+    this._setState({
+      dateFrom: new Date(evt.target.value),
+    });
+  };
+
+  #endDateChangeHandler = (evt) => {
+    this._setState({
+      dateTo: new Date(evt.target.value),
+    });
+  };
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit?.();
+  };
 }
