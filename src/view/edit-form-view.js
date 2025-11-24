@@ -2,6 +2,9 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { EVENT_TYPES } from '../const.js';
 import { convertDate, capitalizeFirstLetter } from '../utils/common.js';
 
+import 'flatpickr/dist/flatpickr.min.css';
+import flatpickr from 'flatpickr';
+
 function createOffersTemplate(point, allOffersByType) {
   if (!allOffersByType || !allOffersByType.offers.length) {
     return '';
@@ -87,7 +90,7 @@ function createPointEditFormTemplate(point, offers, destinations) {
 
   return `
     <li class="trip-events__item">
-      <form class="event event--edit" action="#" method="post">
+      <form class="event event--edit" action="#" method="post" autocomplete="off">
         <header class="event__header">
 
           <div class="event__type-wrapper">
@@ -198,6 +201,8 @@ function createPointEditFormTemplate(point, offers, destinations) {
 export default class PointEditFormView extends AbstractStatefulView {
   #offers = null;
   #destinations = null;
+  #startDatepicker = null;
+  #endDatepicker = null;
 
   constructor({ point, offers, destinations }) {
     super();
@@ -220,6 +225,20 @@ export default class PointEditFormView extends AbstractStatefulView {
     this.updateElement(structuredClone(point));
   }
 
+  removeElement() {
+    if (this.#startDatepicker) {
+      this.#startDatepicker.destroy();
+      this.#startDatepicker = null;
+    }
+
+    if (this.#endDatepicker) {
+      this.#endDatepicker.destroy();
+      this.#endDatepicker = null;
+    }
+
+    super.removeElement();
+  }
+
   _restoreHandlers() {
     this.element
       .querySelector('.event__type-group')
@@ -228,14 +247,6 @@ export default class PointEditFormView extends AbstractStatefulView {
     this.element
       .querySelector('.event__input--destination')
       .addEventListener('change', this.#destinationInputHandler);
-
-    this.element
-      .querySelector('#event-start-time-1')
-      .addEventListener('change', this.#startDateChangeHandler);
-
-    this.element
-      .querySelector('#event-end-time-1')
-      .addEventListener('change', this.#endDateChangeHandler);
 
     this.element
       .querySelector('#event-price-1')
@@ -250,6 +261,8 @@ export default class PointEditFormView extends AbstractStatefulView {
     this.setFormSubmitHandler(this._callback.formSubmit);
 
     this.setRollupButtonClickHandler(this._callback.rollupClick);
+
+    this.#setDatepickers();
   }
 
   setFormSubmitHandler(callback) {
@@ -265,6 +278,44 @@ export default class PointEditFormView extends AbstractStatefulView {
       .querySelector('.event__rollup-btn')
       .addEventListener('click', this._callback.rollupClick);
   }
+
+  #setDatepickers() {
+    this.#startDatepicker?.destroy();
+    this.#endDatepicker?.destroy();
+
+    const startInput = this.element.querySelector('#event-start-time-1');
+    const endInput = this.element.querySelector('#event-end-time-1');
+
+    const commonConfig = {
+      dateFormat: 'd/m/y H:i',
+      enableTime: true,
+      locale: { firstDayOfWeek: 1 },
+    };
+
+    this.#startDatepicker = flatpickr(startInput, {
+      ...commonConfig,
+      defaultDate: this._state.dateFrom,
+      maxDate: this._state.dateTo,
+      onClose: this.#startDateCloseHandler,
+    });
+
+    this.#endDatepicker = flatpickr(endInput, {
+      ...commonConfig,
+      defaultDate: this._state.dateTo,
+      minDate: this._state.dateFrom,
+      onClose: this.#endDateCloseHandler,
+    });
+  }
+
+  #startDateCloseHandler = ([userDate]) => {
+    this._setState({ dateFrom: userDate });
+    this.#endDatepicker.set('minDate', userDate);
+  };
+
+  #endDateCloseHandler = ([userDate]) => {
+    this._setState({ dateTo: userDate });
+    this.#startDatepicker.set('maxDate', userDate);
+  };
 
   #eventTypeChangeHandler = (evt) => {
     evt.preventDefault();
@@ -310,18 +361,6 @@ export default class PointEditFormView extends AbstractStatefulView {
   #priceInputHandler = (evt) => {
     this._setState({
       basePrice: Number(evt.target.value),
-    });
-  };
-
-  #startDateChangeHandler = (evt) => {
-    this._setState({
-      dateFrom: new Date(evt.target.value),
-    });
-  };
-
-  #endDateChangeHandler = (evt) => {
-    this._setState({
-      dateTo: new Date(evt.target.value),
     });
   };
 

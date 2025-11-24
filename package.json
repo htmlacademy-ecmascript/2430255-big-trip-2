@@ -33,7 +33,8 @@
     "node": "20"
   },
   "dependencies": {
-    "dayjs": "1.11.18"
+    "dayjs": "1.11.18",
+    "flatpickr": "^4.6.13"
   },
   "prettier": {
     "singleQuote": true

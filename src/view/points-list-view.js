@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view';
 
 function createEditListTemplate() {
-  return '<ul class="trip-event__list"></ul>';
+  return '<ul class="trip-events__list"></ul>';
 }
 
 export default class PointsListView extends AbstractView {
