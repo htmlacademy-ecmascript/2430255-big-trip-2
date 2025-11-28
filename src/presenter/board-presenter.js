@@ -5,7 +5,6 @@ import FilterView from '../view/filter-view.js';
 import { FilterType, SortType } from '../const.js';
 import { filter } from '../utils/filter.js';
 import { sortByDay, sortByTime, sortByPrice } from '../utils/sort.js';
-import { updateItem } from '../utils/common.js';
 import PointPresenter from './point-presenter.js';
 
 export default class BoardPresenter {
@@ -18,9 +17,6 @@ export default class BoardPresenter {
   #pointsListComponent = new PointsListView();
   #filterComponent = null;
 
-  #points = [];
-  #offers = [];
-  #destinations = [];
   #currentFilter = FilterType.EVERYTHING;
   #currentSortType = SortType.DAY;
 
@@ -31,26 +27,25 @@ export default class BoardPresenter {
     this.#pointModel = pointModel;
     this.#offerModel = offerModel;
     this.#destinationModel = destinationModel;
+
+    this.#pointModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
-    this.#points = this.#pointModel.points;
-    this.#offers = this.#offerModel.offers;
-    this.#destinations = this.#destinationModel.destinations;
-
     this.#renderApp();
   }
+
+  #handleModelEvent = () => {
+    this.#clearPoints();
+    this.#renderPoints();
+  };
 
   #handleModeChange = () => {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
   #handlePointChange = (updatedPoint) => {
-    this.#points = updateItem(this.#points, updatedPoint);
-    const presenter = this.#pointPresenters.get(updatedPoint.id);
-    if (presenter) {
-      presenter.init(updatedPoint);
-    }
+    this.#pointModel.updatePoint(updatedPoint);
   };
 
   #handleFilterChange = (filterType) => {
@@ -89,9 +84,11 @@ export default class BoardPresenter {
   }
 
   #renderFilter() {
+    const points = this.#pointModel.getPoints();
+
     const filters = Object.values(FilterType).map((type) => ({
       type,
-      hasPoints: filter[type](this.#points).length > 0,
+      hasPoints: filter[type](points).length > 0,
     }));
 
     this.#filterComponent = new FilterView({
@@ -136,7 +133,8 @@ export default class BoardPresenter {
   }
 
   #renderPoints() {
-    const filteredPoints = filter[this.#currentFilter](this.#points);
+    const points = this.#pointModel.getPoints();
+    const filteredPoints = filter[this.#currentFilter](points);
     const sortedPoints = this.#getSortedPoints(filteredPoints);
 
     if (!sortedPoints.length) {
@@ -153,8 +151,8 @@ export default class BoardPresenter {
   #renderPoint(point) {
     const presenter = new PointPresenter({
       container: this.#pointsListComponent.element,
-      offers: this.#offers,
-      destinations: this.#destinations,
+      offers: this.#offerModel.getOffers(),
+      destinations: this.#destinationModel.getDestinations(),
       onDataChange: this.#handlePointChange,
       onModeChange: this.#handleModeChange,
     });

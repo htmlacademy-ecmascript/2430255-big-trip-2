@@ -83,6 +83,7 @@ export default class PointPresenter {
     this.#replaceFormToPoint();
   };
 
+
   #handleFavoriteClick = () => {
     this.#handleDataChange({
       ...this.#point,

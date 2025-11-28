@@ -14,9 +14,15 @@ export default class InfoPresenter {
   }
 
   init() {
-    const points = this.#pointModel.points;
-    const destinations = this.#destinationModel.destinations;
-    this.#tripInfoComponent = new TripInfoView({ points, destinations });
+    const points = this.#pointModel.getPoints();
+    const destinations = this.#destinationModel.getDestinations();
+
+    this.#tripInfoComponent = new TripInfoView({
+      points,
+      destinations,
+    });
+
     render(this.#tripInfoComponent, this.#container, 'afterbegin');
   }
 }
+

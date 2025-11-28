@@ -49,13 +49,11 @@ function createDestinationTemplate(destinationData) {
 
   return `
     <section class="event__section event__section--destination">
-      ${
-  description
+      ${description
     ? `<p class="event__destination-description">${description}</p>`
     : ''
 }
-      ${
-  pictures && pictures.length
+      ${pictures && pictures.length
     ? `
         <div class="event__photos-container">
           <div class="event__photos-tape">
@@ -290,6 +288,7 @@ export default class PointEditFormView extends AbstractStatefulView {
       dateFormat: 'd/m/y H:i',
       enableTime: true,
       locale: { firstDayOfWeek: 1 },
+      'time_24hr': true
     };
 
     this.#startDatepicker = flatpickr(startInput, {

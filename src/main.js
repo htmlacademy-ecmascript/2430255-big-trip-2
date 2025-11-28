@@ -28,9 +28,9 @@ const boardPresenter = new BoardPresenter({
 const infoPresenter = new InfoPresenter({
   container: infoElement,
   pointModel,
-  offerModel,
   destinationModel,
 });
+
 
 infoPresenter.init();
 boardPresenter.init();
