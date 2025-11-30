@@ -1,5 +1,6 @@
 import Observable from '../framework/observable.js';
 import { mockPoints } from '../mock/points.js';
+import { UpdateType } from '../const.js';
 
 export default class PointModel extends Observable {
   #points = [];
@@ -10,7 +11,7 @@ export default class PointModel extends Observable {
 
   init() {
     this.#points = mockPoints;
-    this._notify('init');
+    this._notify(UpdateType.INIT);
   }
 
   get points() {
@@ -19,7 +20,7 @@ export default class PointModel extends Observable {
 
   set points(points) {
     this.#points = [...points];
-    this._notify('points:set', this.#points);
+    this._notify(UpdateType.MINOR, this.#points);
   }
 
   updatePoint(update) {
@@ -37,6 +38,28 @@ export default class PointModel extends Observable {
       ...this.#points.slice(index + 1),
     ];
 
-    this._notify('points:update', update);
+    this._notify(UpdateType.MINOR, update);
+  }
+
+  addPoint(point) {
+    this.#points = [point, ...this.#points];
+    this._notify(UpdateType.MAJOR, point);
+  }
+
+  deletePoint(point) {
+    const index = this.#points.findIndex((p) => p.id === point.id);
+
+    if (index === -1) {
+      throw new Error(
+        `Can't delete point. Point with id=${point.id} not found`
+      );
+    }
+
+    this.#points = [
+      ...this.#points.slice(0, index),
+      ...this.#points.slice(index + 1),
+    ];
+
+    this._notify(UpdateType.MAJOR, point);
   }
 }

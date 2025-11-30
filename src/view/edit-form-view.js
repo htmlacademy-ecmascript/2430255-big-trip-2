@@ -49,11 +49,13 @@ function createDestinationTemplate(destinationData) {
 
   return `
     <section class="event__section event__section--destination">
-      ${description
+      ${
+  description
     ? `<p class="event__destination-description">${description}</p>`
     : ''
 }
-      ${pictures && pictures.length
+      ${
+  pictures && pictures.length
     ? `
         <div class="event__photos-container">
           <div class="event__photos-tape">
@@ -246,9 +248,10 @@ export default class PointEditFormView extends AbstractStatefulView {
       .querySelector('.event__input--destination')
       .addEventListener('change', this.#destinationInputHandler);
 
-    this.element
-      .querySelector('#event-price-1')
-      .addEventListener('input', this.#priceInputHandler);
+    const priceInput = this.element.querySelector('#event-price-1');
+    if (priceInput) {
+      priceInput.addEventListener('input', this.#priceInputHandler);
+    }
 
     this.element
       .querySelectorAll('.event__offer-checkbox')
@@ -256,25 +259,34 @@ export default class PointEditFormView extends AbstractStatefulView {
         checkbox.addEventListener('change', this.#offerToggleHandler)
       );
 
-    this.setFormSubmitHandler(this._callback.formSubmit);
+    const form = this.element.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', this.#formSubmitHandler);
+    }
 
-    this.setRollupButtonClickHandler(this._callback.rollupClick);
+    const rollupBtn = this.element.querySelector('.event__rollup-btn');
+    if (rollupBtn) {
+      rollupBtn.addEventListener('click', this._callback.rollupClick);
+    }
+
+    const resetBtn = this.element.querySelector('.event__reset-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', this.#deleteClickHandler);
+    }
 
     this.#setDatepickers();
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
-    this.element
-      .querySelector('form')
-      .addEventListener('submit', this.#formSubmitHandler);
   }
 
   setRollupButtonClickHandler(callback) {
     this._callback.rollupClick = callback;
-    this.element
-      .querySelector('.event__rollup-btn')
-      .addEventListener('click', this._callback.rollupClick);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
   }
 
   #setDatepickers() {
@@ -288,7 +300,7 @@ export default class PointEditFormView extends AbstractStatefulView {
       dateFormat: 'd/m/y H:i',
       enableTime: true,
       locale: { firstDayOfWeek: 1 },
-      'time_24hr': true
+      'time_24hr': true,
     };
 
     this.#startDatepicker = flatpickr(startInput, {
@@ -328,13 +340,14 @@ export default class PointEditFormView extends AbstractStatefulView {
 
   #destinationInputHandler = (evt) => {
     evt.preventDefault();
-    const value = evt.target.value;
+    const value = evt.target.value.trim();
 
     const selectedDestination = this.#destinations.find(
       (dest) => dest.name === value
     );
 
     if (!selectedDestination) {
+      evt.target.value = '';
       return;
     }
 
@@ -358,13 +371,25 @@ export default class PointEditFormView extends AbstractStatefulView {
   };
 
   #priceInputHandler = (evt) => {
+    const value = evt.target.value;
+
+    if (!/^\d*$/.test(value)) {
+      evt.target.value = this._state.basePrice;
+      return;
+    }
+
     this._setState({
-      basePrice: Number(evt.target.value),
+      basePrice: Number(value),
     });
   };
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._callback.formSubmit?.();
+    this._callback.formSubmit?.(structuredClone(this._state));
+  };
+
+  #deleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteClick?.(structuredClone(this._state));
   };
 }

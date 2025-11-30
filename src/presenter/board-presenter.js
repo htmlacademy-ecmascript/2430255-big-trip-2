@@ -1,7 +1,8 @@
 import { render, replace, remove } from '../framework/render.js';
 import PointsListView from '../view/points-list-view.js';
 import SortingView from '../view/sorting-view.js';
-import { SortType, UpdateType } from '../const.js';
+import PointEditFormView from '../view/edit-form-view.js';
+import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
 import { sortByDay, sortByTime, sortByPrice } from '../utils/sort.js';
 import PointPresenter from './point-presenter.js';
@@ -18,6 +19,9 @@ export default class BoardPresenter {
 
   #currentSortType = SortType.DAY;
   #pointPresenters = new Map();
+
+  #newPointComponent = null;
+  #newPointOpen = false;
 
   constructor({
     container,
@@ -38,6 +42,11 @@ export default class BoardPresenter {
 
   init() {
     this.#renderBoard();
+
+    const newEventButton = document.querySelector('.trip-main__event-add-btn');
+    if (newEventButton) {
+      newEventButton.addEventListener('click', this.#handleNewPointClick);
+    }
   }
 
   #handleModelEvent = (updateType) => {
@@ -57,12 +66,24 @@ export default class BoardPresenter {
     }
   };
 
-  #handleModeChange = () => {
-    this.#pointPresenters.forEach((p) => p.resetView());
+  #handleViewAction = (actionType, updateType, update) => {
+    switch (actionType) {
+      case UserAction.UPDATE_POINT:
+        this.#pointModel.updatePoint(update);
+        break;
+
+      case UserAction.ADD_POINT:
+        this.#pointModel.addPoint(update);
+        break;
+
+      case UserAction.DELETE_POINT:
+        this.#pointModel.deletePoint(update);
+        break;
+    }
   };
 
-  #handlePointChange = (updatedPoint) => {
-    this.#pointModel.updatePoint(updatedPoint);
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((p) => p.resetView());
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -148,11 +169,85 @@ export default class BoardPresenter {
       container: this.#pointsListComponent.element,
       offers: this.#offerModel.offers,
       destinations: this.#destinationModel.destinations,
-      onDataChange: this.#handlePointChange,
+      onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange,
     });
 
     presenter.init(point);
     this.#pointPresenters.set(point.id, presenter);
+  }
+
+  #createEmptyPoint() {
+    const dest = this.#destinationModel.destinations[0];
+    return {
+      id: `new-${Date.now()}`,
+      type: 'taxi',
+      destination: dest ? dest.id : null,
+      basePrice: 0,
+      dateFrom: new Date().toISOString(),
+      dateTo: new Date().toISOString(),
+      isFavorite: false,
+      offers: [],
+    };
+  }
+
+  #handleNewPointClick = (evt) => {
+    evt.preventDefault();
+
+    if (this.#newPointOpen) {
+      return;
+    }
+
+    // reset filter and sort
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#currentSortType = SortType.DAY;
+
+    this.#handleModeChange();
+
+    this.#newPointComponent = new PointEditFormView({
+      point: this.#createEmptyPoint(),
+      offers: this.#offerModel.offers,
+      destinations: this.#destinationModel.destinations,
+    });
+
+    this.#newPointComponent._restoreHandlers();
+    this.#newPointComponent.setFormSubmitHandler(this.#handleNewFormSubmit);
+    this.#newPointComponent.setDeleteClickHandler(this.#handleNewFormCancel);
+    render(
+      this.#newPointComponent,
+      this.#pointsListComponent.element,
+      'afterbegin'
+    );
+
+    this.#newPointOpen = true;
+
+    const newEventButton = document.querySelector('.trip-main__event-add-btn');
+    if (newEventButton) {
+      newEventButton.disabled = true;
+    }
+  };
+
+  #handleNewFormSubmit = (newPoint) => {
+    this.#handleViewAction(UserAction.ADD_POINT, UpdateType.MAJOR, newPoint);
+    this.#destroyNewForm();
+  };
+
+  #handleNewFormCancel = () => {
+    this.#destroyNewForm();
+  };
+
+  #destroyNewForm() {
+    if (!this.#newPointComponent) {
+      return;
+    }
+
+    remove(this.#newPointComponent);
+    this.#newPointComponent = null;
+    this.#newPointOpen = false;
+
+    const newEventButton = document.querySelector('.trip-main__event-add-btn');
+    if (newEventButton) {
+      newEventButton.disabled = false;
+    }
   }
 }
