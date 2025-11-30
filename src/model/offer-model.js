@@ -13,13 +13,12 @@ export default class OfferModel extends Observable {
     this._notify('init');
   }
 
-  getOffers() {
+  get offers() {
     return this.#offers;
   }
 
-  setOffers(offers) {
+  set offers(offers) {
     this.#offers = [...offers];
     this._notify('offers:set', this.#offers);
   }
 }
-

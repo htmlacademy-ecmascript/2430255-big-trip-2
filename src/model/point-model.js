@@ -13,11 +13,11 @@ export default class PointModel extends Observable {
     this._notify('init');
   }
 
-  getPoints() {
+  get points() {
     return this.#points;
   }
 
-  setPoints(points) {
+  set points(points) {
     this.#points = [...points];
     this._notify('points:set', this.#points);
   }
@@ -26,7 +26,9 @@ export default class PointModel extends Observable {
     const index = this.#points.findIndex((point) => point.id === update.id);
 
     if (index === -1) {
-      throw new Error(`Can't update point. Point with id=${update.id} not found`);
+      throw new Error(
+        `Can't update point. Point with id=${update.id} not found`
+      );
     }
 
     this.#points = [

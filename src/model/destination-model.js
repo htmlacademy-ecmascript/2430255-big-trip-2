@@ -13,13 +13,12 @@ export default class DestinationModel extends Observable {
     this._notify('init');
   }
 
-  getDestinations() {
+  get destinations() {
     return this.#destinations;
   }
 
-  setDestinations(destinations) {
+  set destinations(destinations) {
     this.#destinations = [...destinations];
     this._notify('destinations:set', this.#destinations);
   }
 }
-
