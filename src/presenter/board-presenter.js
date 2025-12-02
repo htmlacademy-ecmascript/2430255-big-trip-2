@@ -178,16 +178,15 @@ export default class BoardPresenter {
   }
 
   #createEmptyPoint() {
-    const dest = this.#destinationModel.destinations[0];
     return {
-      id: `new-${Date.now()}`,
-      type: 'taxi',
-      destination: dest ? dest.id : null,
-      basePrice: 0,
-      dateFrom: new Date().toISOString(),
-      dateTo: new Date().toISOString(),
+      id: null,
+      type: 'flight',
+      dateFrom: null,
+      dateTo: null,
+      destination: null,
+      basePrice: '',
       isFavorite: false,
-      offers: [],
+      offers: []
     };
   }
 
@@ -198,7 +197,6 @@ export default class BoardPresenter {
       return;
     }
 
-    // reset filter and sort
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#currentSortType = SortType.DAY;
 
@@ -213,6 +211,7 @@ export default class BoardPresenter {
     this.#newPointComponent._restoreHandlers();
     this.#newPointComponent.setFormSubmitHandler(this.#handleNewFormSubmit);
     this.#newPointComponent.setDeleteClickHandler(this.#handleNewFormCancel);
+
     render(
       this.#newPointComponent,
       this.#pointsListComponent.element,

@@ -41,17 +41,16 @@ export default class PointPresenter {
       destinations: this.#destinations,
     });
 
-    this.#pointEditComponent._restoreHandlers();
-
     this.#pointComponent.setRollupButtonClickHandler(() =>
       this.#replacePointToForm()
     );
+    this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+
     this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#pointEditComponent.setRollupButtonClickHandler(() =>
       this.#replaceFormToPoint()
     );
     this.#pointEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
-    this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
 
     if (!prevPointComponent || !prevEditComponent) {
       render(this.#pointComponent, this.#container);
@@ -87,20 +86,33 @@ export default class PointPresenter {
   };
 
   #handleDeleteClick = (point) => {
-    this.#handleViewAction(UserAction.DELETE_POINT, UpdateType.MAJOR, point);
+    const isNewPoint = !this.#point.id;
+    if (isNewPoint) {
+      this.destroy();
+      return;
+    }
+    this.#handleViewAction(
+      UserAction.DELETE_POINT,
+      UpdateType.MAJOR,
+      point
+    );
   };
 
   #handleFavoriteClick = () => {
-    this.#handleViewAction(UserAction.UPDATE_POINT, UpdateType.MINOR, {
-      ...this.#point,
-      isFavorite: !this.#point.isFavorite,
-    });
+    this.#handleViewAction(
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
+      { ...this.#point, isFavorite: !this.#point.isFavorite }
+    );
   };
 
   #replacePointToForm() {
     this.#handleModeChange();
     replace(this.#pointEditComponent, this.#pointComponent);
-    document.addEventListener('keydown', this.#onEscKeyDown);
+    this.#pointEditComponent._restoreHandlers();
+    if (this.#point.id) {
+      document.addEventListener('keydown', this.#onEscKeyDown);
+    }
   }
 
   #replaceFormToPoint() {

@@ -44,8 +44,8 @@ export const mockPoints = [
   {
     id: '5',
     basePrice: getRandomInteger(800, 1100),
-    dateFrom: '2025-11-07T22:55:56.845Z',
-    dateTo: '2025-11-16T11:00:00.375Z',
+    dateFrom: '2026-11-07T22:55:56.845Z',
+    dateTo: '2026-11-16T11:00:00.375Z',
     destination: '1',
     isFavorite: true,
     offers: [],

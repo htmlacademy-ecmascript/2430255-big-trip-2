@@ -42,8 +42,13 @@ export default class PointModel extends Observable {
   }
 
   addPoint(point) {
-    this.#points = [point, ...this.#points];
-    this._notify(UpdateType.MAJOR, point);
+    const pointWithId = {
+      ...point,
+      id: point.id ?? `id-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+    };
+
+    this.#points = [pointWithId, ...this.#points];
+    this._notify(UpdateType.MAJOR, pointWithId);
   }
 
   deletePoint(point) {

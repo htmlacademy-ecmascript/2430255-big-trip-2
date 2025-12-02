@@ -35,16 +35,16 @@ const DATE_FORMAT = {
 };
 
 const FilterType = {
-  EVERYTHING: 'everything',
-  PAST: 'past',
-  PRESENT: 'present',
-  FUTURE: 'future',
+  EVERYTHING: 'EVERYTHING',
+  PAST: 'PAST',
+  PRESENT: 'PRESENT',
+  FUTURE: 'FUTURE',
 };
 
 const SortType = {
-  DAY: 'day',
-  TIME: 'time',
-  PRICE: 'price',
+  DAY: 'DAY',
+  TIME: 'TIME',
+  PRICE: 'PRICE',
 };
 
 const UpdateType = {
