@@ -110,6 +110,7 @@ export default class BoardPresenter {
 
   #renderBoard() {
     this.#renderSorting();
+    this.#clearPointList();
     render(this.#pointsListComponent, this.#mainContainer);
     this.#renderPoints();
   }
@@ -150,14 +151,16 @@ export default class BoardPresenter {
   }
 
   #renderPoints() {
+    this.#clearPointList();
+
     const filtered = this.#getFilteredPoints();
     const sorted = this.#getSortedPoints(filtered);
 
     if (!sorted.length) {
       this.#pointsListComponent.element.innerHTML = `
-        <p class="trip-events__msg">
-          There are no ${this.#filterModel.filter} events now
-        </p>`;
+      <p class="trip-events__msg">
+        There are no ${this.#filterModel.filter} events now
+      </p>`;
       return;
     }
 
@@ -234,6 +237,10 @@ export default class BoardPresenter {
   #handleNewFormCancel = () => {
     this.#destroyNewForm();
   };
+
+  #clearPointList() {
+    this.#pointsListComponent.element.innerHTML = '';
+  }
 
   #destroyNewForm() {
     if (!this.#newPointComponent) {
