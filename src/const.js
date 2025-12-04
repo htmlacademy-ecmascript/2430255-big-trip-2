@@ -1,4 +1,4 @@
-export const EVENT_TYPES = [
+const EVENT_TYPES = [
   'taxi',
   'bus',
   'train',
@@ -10,7 +10,7 @@ export const EVENT_TYPES = [
   'restaurant',
 ];
 
-export const POINT_DESCRIPTIONS = [
+const POINT_DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
   'Fusce tristique felis at fermentum pharetra.',
@@ -23,7 +23,7 @@ export const POINT_DESCRIPTIONS = [
   'In rutrum ac purus sit amet tempus.',
 ];
 
-export const DATE_FORMAT = {
+const DATE_FORMAT = {
   SHORT_DATE: 'MMM DD',
   FULL_DATE: 'YYYY-MM-DD',
   ONLY_TIME: 'HH:mm',
@@ -34,15 +34,38 @@ export const DATE_FORMAT = {
   TRIP_INFO_DATE: 'D MMM',
 };
 
-export const FilterType = {
-  EVERYTHING: 'everything',
-  PAST: 'past',
-  PRESENT: 'present',
-  FUTURE: 'future',
+const FilterType = {
+  EVERYTHING: 'EVERYTHING',
+  PAST: 'PAST',
+  PRESENT: 'PRESENT',
+  FUTURE: 'FUTURE',
 };
 
-export const SortType = {
-  DAY: 'day',
-  TIME: 'time',
-  PRICE: 'price',
+const SortType = {
+  DAY: 'DAY',
+  TIME: 'TIME',
+  PRICE: 'PRICE',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+  INIT: 'INIT',
+};
+
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+export {
+  EVENT_TYPES,
+  POINT_DESCRIPTIONS,
+  DATE_FORMAT,
+  FilterType,
+  SortType,
+  UpdateType,
+  UserAction,
 };

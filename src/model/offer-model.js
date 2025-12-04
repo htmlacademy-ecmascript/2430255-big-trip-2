@@ -1,17 +1,24 @@
+import Observable from '../framework/observable.js';
 import { mockOffers } from '../mock/offers.js';
 
-export default class OfferModel {
+export default class OfferModel extends Observable {
   #offers = [];
 
   constructor() {
-    this.#offers = [];
+    super();
   }
 
   init() {
     this.#offers = mockOffers;
+    this._notify('init');
   }
 
   get offers() {
     return this.#offers;
+  }
+
+  set offers(offers) {
+    this.#offers = [...offers];
+    this._notify('offers:set', this.#offers);
   }
 }
