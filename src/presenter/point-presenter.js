@@ -85,6 +85,14 @@ export default class PointPresenter {
     this.#replaceFormToPoint();
   };
 
+  #handleFavoriteClick = () => {
+    this.#handleViewAction(
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
+      { ...this.#point, isFavorite: !this.#point.isFavorite }
+    );
+  };
+
   #handleDeleteClick = (point) => {
     const isNewPoint = !this.#point.id;
     if (isNewPoint) {
@@ -95,14 +103,6 @@ export default class PointPresenter {
       UserAction.DELETE_POINT,
       UpdateType.MAJOR,
       point
-    );
-  };
-
-  #handleFavoriteClick = () => {
-    this.#handleViewAction(
-      UserAction.UPDATE_POINT,
-      UpdateType.PATCH,
-      { ...this.#point, isFavorite: !this.#point.isFavorite }
     );
   };
 
