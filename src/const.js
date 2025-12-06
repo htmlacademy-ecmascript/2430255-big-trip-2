@@ -1,3 +1,5 @@
+import { generateAuthString } from './utils/common.js';
+
 const EVENT_TYPES = [
   'taxi',
   'bus',
@@ -34,6 +36,10 @@ const DATE_FORMAT = {
   TRIP_INFO_DATE: 'D MMM',
 };
 
+const API_URL = 'https://22.objects.htmlacademy.pro/big-trip';
+
+const AUTHORIZATION = generateAuthString();
+
 const FilterType = {
   EVERYTHING: 'EVERYTHING',
   PAST: 'PAST',
@@ -64,6 +70,8 @@ export {
   EVENT_TYPES,
   POINT_DESCRIPTIONS,
   DATE_FORMAT,
+  API_URL,
+  AUTHORIZATION,
   FilterType,
   SortType,
   UpdateType,

@@ -108,6 +108,11 @@ const updateItem = function (items, update) {
   return items.map((item) => (item.id === update.id ? update : item));
 };
 
+const generateAuthString = () => {
+  const randomString = Math.random().toString(36).substring(2);
+  return `Basic ${randomString}`;
+};
+
 export {
   isEscapeKey,
   getRandomInteger,
@@ -119,4 +124,5 @@ export {
   calculateTotalPrice,
   getRouteInfo,
   updateItem,
+  generateAuthString
 };
