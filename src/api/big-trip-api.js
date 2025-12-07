@@ -1,4 +1,4 @@
-import ApiService from '../services/api-service.js';
+import ApiService from '../framework/api-service.js';
 import PointAdapter from '../adapters/point-adapter.js';
 import DestinationAdapter from '../adapters/destination-adapter.js';
 import OfferAdapter from '../adapters/offer-adapter.js';

@@ -1,9 +1,4 @@
 export default class PointAdapter {
-  /**
-   * Преобразует данные точки с сервера в клиентский формат
-   * @param {Object} point - данные с сервера
-   * @returns {Object} точка в формате приложения
-   */
   static adaptToClient(point) {
     const adaptedPoint = {
       ...point,
@@ -13,7 +8,6 @@ export default class PointAdapter {
       isFavorite: point['is_favorite'],
     };
 
-    // Удаляем лишние поля, если они есть
     delete adaptedPoint['base_price'];
     delete adaptedPoint['date_from'];
     delete adaptedPoint['date_to'];
@@ -22,11 +16,6 @@ export default class PointAdapter {
     return adaptedPoint;
   }
 
-  /**
-   * Преобразует данные точки из клиентского формата в формат сервера
-   * @param {Object} point - данные точки в формате приложения
-   * @returns {Object} точка в формате сервера
-   */
   static adaptToServer(point) {
     const adaptedPoint = {
       ...point,
@@ -36,7 +25,6 @@ export default class PointAdapter {
       'is_favorite': point.isFavorite,
     };
 
-    // Удаляем лишние поля
     delete adaptedPoint.basePrice;
     delete adaptedPoint.dateFrom;
     delete adaptedPoint.dateTo;

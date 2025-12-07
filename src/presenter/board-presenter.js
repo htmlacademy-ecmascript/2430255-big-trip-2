@@ -1,6 +1,8 @@
 import { render, replace, remove } from '../framework/render.js';
 import PointsListView from '../view/points-list-view.js';
 import SortingView from '../view/sorting-view.js';
+import LoadingView from '../view/loading-view.js';
+import ErrorView from '../view/error-view.js';
 import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
 import { sortByDay, sortByTime, sortByPrice } from '../utils/sort.js';
@@ -16,10 +18,14 @@ export default class BoardPresenter {
 
   #sortingComponent = null;
   #pointsListComponent = new PointsListView();
+  #loadingComponent = new LoadingView();
+  #errorComponent = new ErrorView();
 
   #currentSortType = SortType.DAY;
   #pointPresenters = new Map();
   #newPointPresenter = null;
+  #isLoading = true;
+  #isError = false;
 
   constructor({
     container,
@@ -36,6 +42,8 @@ export default class BoardPresenter {
 
     this.#pointModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#offerModel.addObserver(this.#handleModelEvent);
+    this.#destinationModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
@@ -47,9 +55,19 @@ export default class BoardPresenter {
     }
   }
 
-  #handleModelEvent = (updateType) => {
+  #handleModelEvent = (updateType, data) => {
     switch (updateType) {
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        if (this.#pointModel.points.length === 0) {
+          this.#isError = true;
+        }
+        this.#clearBoard();
+        this.#renderBoard();
+        break;
+
       case UpdateType.PATCH:
+        this.#pointPresenters.get(data.id).init(data);
         break;
 
       case UpdateType.MINOR:
@@ -67,15 +85,15 @@ export default class BoardPresenter {
   #handleViewAction = (actionType, updateType, update) => {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointModel.updatePoint(update);
+        this.#pointModel.updatePoint(updateType, update);
         break;
 
       case UserAction.ADD_POINT:
-        this.#pointModel.addPoint(update);
+        this.#pointModel.addPoint(updateType, update);
         break;
 
       case UserAction.DELETE_POINT:
-        this.#pointModel.deletePoint(update);
+        this.#pointModel.deletePoint(updateType, update);
         break;
     }
   };
@@ -112,6 +130,16 @@ export default class BoardPresenter {
   };
 
   #renderBoard() {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
+    if (this.#isError) {
+      this.#renderError();
+      return;
+    }
+
     this.#renderSorting();
     this.#clearPointList();
     render(this.#pointsListComponent, this.#mainContainer);
@@ -127,10 +155,19 @@ export default class BoardPresenter {
   }
 
   #clearBoard() {
-    this.#clearPoints();
-
+    remove(this.#loadingComponent);
+    remove(this.#errorComponent);
     remove(this.#sortingComponent);
+    this.#clearPoints();
     this.#sortingComponent = null;
+  }
+
+  #renderLoading() {
+    render(this.#loadingComponent, this.#mainContainer);
+  }
+
+  #renderError() {
+    render(this.#errorComponent, this.#mainContainer);
   }
 
   #renderSorting() {

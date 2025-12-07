@@ -82,7 +82,6 @@ export default class PointPresenter {
       UpdateType.MINOR,
       updatedPoint
     );
-    this.#replaceFormToPoint();
   };
 
   #handleFavoriteClick = () => {

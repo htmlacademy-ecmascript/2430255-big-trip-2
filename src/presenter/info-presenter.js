@@ -1,5 +1,6 @@
 import TripInfoView from '../view/trip-info-view.js';
-import { render, replace } from '../framework/render.js';
+import { render, replace, remove } from '../framework/render.js';
+import { UpdateType } from '../const.js';
 
 export default class InfoPresenter {
   #container = null;
@@ -13,6 +14,7 @@ export default class InfoPresenter {
     this.#destinationModel = destinationModel;
 
     this.#pointModel.addObserver(this.#handleModelEvent);
+    this.#destinationModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
@@ -22,6 +24,14 @@ export default class InfoPresenter {
   #renderInfo() {
     const points = this.#pointModel.points;
     const destinations = this.#destinationModel.destinations;
+
+    if (points.length === 0) {
+      if (this.#tripInfoComponent) {
+        remove(this.#tripInfoComponent);
+        this.#tripInfoComponent = null;
+      }
+      return;
+    }
 
     const prevComponent = this.#tripInfoComponent;
 
@@ -36,9 +46,12 @@ export default class InfoPresenter {
     }
 
     replace(this.#tripInfoComponent, prevComponent);
+    remove(prevComponent);
   }
 
-  #handleModelEvent = () => {
-    this.#renderInfo();
+  #handleModelEvent = (updateType) => {
+    if (updateType === UpdateType.INIT || updateType === UpdateType.MINOR || updateType === UpdateType.MAJOR) {
+      this.#renderInfo();
+    }
   };
 }

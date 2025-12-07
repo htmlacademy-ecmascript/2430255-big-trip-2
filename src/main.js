@@ -5,6 +5,8 @@ import PointModel from './model/point-model.js';
 import OfferModel from './model/offer-model.js';
 import DestinationModel from './model/destination-model.js';
 import FilterModel from './model/filter-model.js';
+import BigTripApi from './api/big-trip-api.js';
+import { API_URL, AUTHORIZATION } from './const.js';
 
 const headerElement = document.querySelector('.page-header');
 const filterContainer = headerElement.querySelector('.trip-controls__filters');
@@ -14,14 +16,12 @@ const infoElement = headerElement.querySelector('.trip-main');
 const mainElement = document.querySelector('.page-main');
 const eventsContainer = mainElement.querySelector('.trip-events');
 
-const pointModel = new PointModel();
-const offerModel = new OfferModel();
-const destinationModel = new DestinationModel();
-const filterModel = new FilterModel();
+const api = new BigTripApi(API_URL, AUTHORIZATION);
 
-pointModel.init();
-offerModel.init();
-destinationModel.init();
+const pointModel = new PointModel(api);
+const offerModel = new OfferModel(api);
+const destinationModel = new DestinationModel(api);
+const filterModel = new FilterModel();
 
 const filterPresenter = new FilterPresenter({
   container: filterContainer,
@@ -40,10 +40,19 @@ const boardPresenter = new BoardPresenter({
 const infoPresenter = new InfoPresenter({
   container: infoElement,
   pointModel,
-  offerModel,
   destinationModel,
 });
 
-infoPresenter.init();
-filterPresenter.init();
-boardPresenter.init();
+Promise.all([
+  pointModel.init(),
+  offerModel.init(),
+  destinationModel.init(),
+])
+  .then(() => {
+    infoPresenter.init();
+    filterPresenter.init();
+    boardPresenter.init();
+  })
+  .catch(() => {
+    throw new Error('Failed to initialize application');
+  });
