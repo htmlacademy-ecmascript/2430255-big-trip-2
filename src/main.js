@@ -23,17 +23,17 @@ const offerModel = new OfferModel(api);
 const destinationModel = new DestinationModel(api);
 const filterModel = new FilterModel();
 
-const filterPresenter = new FilterPresenter({
-  container: filterContainer,
-  pointModel,
-  filterModel,
-});
-
 const boardPresenter = new BoardPresenter({
   container: eventsContainer,
   pointModel,
   offerModel,
   destinationModel,
+  filterModel,
+});
+
+const filterPresenter = new FilterPresenter({
+  container: filterContainer,
+  pointModel,
   filterModel,
 });
 
@@ -43,16 +43,15 @@ const infoPresenter = new InfoPresenter({
   destinationModel,
 });
 
+boardPresenter.init();
+filterPresenter.init();
+infoPresenter.init();
+
 Promise.all([
   pointModel.init(),
   offerModel.init(),
   destinationModel.init(),
 ])
-  .then(() => {
-    infoPresenter.init();
-    filterPresenter.init();
-    boardPresenter.init();
-  })
   .catch(() => {
     throw new Error('Failed to initialize application');
   });

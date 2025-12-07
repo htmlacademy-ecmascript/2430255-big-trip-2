@@ -82,18 +82,18 @@ export default class BoardPresenter {
     }
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointModel.updatePoint(updateType, update);
+        await this.#pointModel.updatePoint(updateType, update);
         break;
 
       case UserAction.ADD_POINT:
-        this.#pointModel.addPoint(updateType, update);
+        await this.#pointModel.addPoint(updateType, update);
         break;
 
       case UserAction.DELETE_POINT:
-        this.#pointModel.deletePoint(updateType, update);
+        await this.#pointModel.deletePoint(updateType, update);
         break;
     }
   };

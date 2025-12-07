@@ -8,16 +8,6 @@ dayjs.extend(duration);
 
 const isEscapeKey = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
-const getRandomInteger = (a, b) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-  const result = Math.random() * (upper - lower + 1) + lower;
-  return Math.floor(result);
-};
-
-const getRandomArrayElement = (elements) =>
-  elements[getRandomInteger(0, elements.length - 1)];
-
 const convertDate = (date, formatKey) =>
   dayjs.utc(date).utcOffset(1, true).format(DATE_FORMAT[formatKey]);
 
@@ -115,8 +105,6 @@ const generateAuthString = () => {
 
 export {
   isEscapeKey,
-  getRandomInteger,
-  getRandomArrayElement,
   convertDate,
   getDuration,
   getEventDuration,

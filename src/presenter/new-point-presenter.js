@@ -54,12 +54,17 @@ export default class NewPointPresenter {
     }
   }
 
-  #handleFormSubmit = (point) => {
-    this.#onDataChange(
-      UserAction.ADD_POINT,
-      UpdateType.MAJOR,
-      point
-    );
+  #handleFormSubmit = async (point) => {
+    try {
+      await this.#onDataChange(
+        UserAction.ADD_POINT,
+        UpdateType.MAJOR,
+        point
+      );
+      this.destroy();
+    } catch (error) {
+      throw new Error('Failed to add point');
+    }
   };
 
   #handleCancel = () => {

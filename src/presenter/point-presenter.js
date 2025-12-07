@@ -76,33 +76,47 @@ export default class PointPresenter {
     }
   }
 
-  #handleFormSubmit = (updatedPoint) => {
-    this.#handleViewAction(
-      UserAction.UPDATE_POINT,
-      UpdateType.MINOR,
-      updatedPoint
-    );
+  #handleFormSubmit = async (updatedPoint) => {
+    try {
+      await this.#handleViewAction(
+        UserAction.UPDATE_POINT,
+        UpdateType.MINOR,
+        updatedPoint
+      );
+      this.#replaceFormToPoint();
+    } catch (error) {
+      throw new Error('Failed to update point');
+    }
   };
 
-  #handleFavoriteClick = () => {
-    this.#handleViewAction(
-      UserAction.UPDATE_POINT,
-      UpdateType.PATCH,
-      { ...this.#point, isFavorite: !this.#point.isFavorite }
-    );
+  #handleFavoriteClick = async () => {
+    try {
+      await this.#handleViewAction(
+        UserAction.UPDATE_POINT,
+        UpdateType.PATCH,
+        { ...this.#point, isFavorite: !this.#point.isFavorite }
+      );
+    } catch (error) {
+      throw new Error('Failed to update favorite status');
+    }
   };
 
-  #handleDeleteClick = (point) => {
+  #handleDeleteClick = async (point) => {
     const isNewPoint = !this.#point.id;
     if (isNewPoint) {
       this.destroy();
       return;
     }
-    this.#handleViewAction(
-      UserAction.DELETE_POINT,
-      UpdateType.MAJOR,
-      point
-    );
+
+    try {
+      await this.#handleViewAction(
+        UserAction.DELETE_POINT,
+        UpdateType.MAJOR,
+        point
+      );
+    } catch (error) {
+      throw new Error('Failed to delete point');
+    }
   };
 
   #replacePointToForm() {
