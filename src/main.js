@@ -31,6 +31,8 @@ const boardPresenter = new BoardPresenter({
   filterModel,
 });
 
+boardPresenter.init();
+
 const filterPresenter = new FilterPresenter({
   container: filterContainer,
   pointModel,
@@ -43,15 +45,18 @@ const infoPresenter = new InfoPresenter({
   destinationModel,
 });
 
-boardPresenter.init();
-filterPresenter.init();
-infoPresenter.init();
-
 Promise.all([
   pointModel.init(),
   offerModel.init(),
   destinationModel.init(),
 ])
+  .then(() => {
+    boardPresenter.init();
+    filterPresenter.init();
+    infoPresenter.init();
+  })
   .catch(() => {
-    throw new Error('Failed to initialize application');
+    boardPresenter.init();
+    filterPresenter.init();
+    infoPresenter.init();
   });

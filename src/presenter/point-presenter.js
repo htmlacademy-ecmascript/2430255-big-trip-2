@@ -26,6 +26,11 @@ export default class PointPresenter {
   init(point) {
     this.#point = point;
 
+    if (!this.#destinations || !this.#offers ||
+      this.#destinations.length === 0 || this.#offers.length === 0) {
+      return;
+    }
+
     const prevPointComponent = this.#pointComponent;
     const prevEditComponent = this.#pointEditComponent;
 
