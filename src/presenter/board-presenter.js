@@ -51,6 +51,7 @@ export default class BoardPresenter {
 
     const newEventButton = document.querySelector('.trip-main__event-add-btn');
     if (newEventButton) {
+      newEventButton.removeEventListener('click', this.#handleNewPointClick);
       newEventButton.addEventListener('click', this.#handleNewPointClick);
     }
   }
@@ -58,13 +59,20 @@ export default class BoardPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.INIT:
-        this.#isLoading = false;
-        if (this.#pointModel.points.length === 0) {
+        if (data?.error) {
+          this.#isLoading = false;
           this.#isError = true;
+          this.#clearBoard();
+          this.#renderBoard();
+          return;
         }
+
+        this.#isLoading = false;
+        this.#isError = false;
         this.#clearBoard();
         this.#renderBoard();
         break;
+
 
       case UpdateType.PATCH:
         this.#pointPresenters.get(data.id).init(data);

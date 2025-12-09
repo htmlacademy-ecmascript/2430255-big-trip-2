@@ -51,12 +51,10 @@ Promise.all([
   destinationModel.init(),
 ])
   .then(() => {
-    boardPresenter.init();
     filterPresenter.init();
     infoPresenter.init();
   })
   .catch(() => {
-    boardPresenter.init();
     filterPresenter.init();
     infoPresenter.init();
   });
