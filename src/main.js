@@ -5,6 +5,8 @@ import PointModel from './model/point-model.js';
 import OfferModel from './model/offer-model.js';
 import DestinationModel from './model/destination-model.js';
 import FilterModel from './model/filter-model.js';
+import BigTripApi from './api/big-trip-api.js';
+import { API_URL, AUTHORIZATION } from './const.js';
 
 const headerElement = document.querySelector('.page-header');
 const filterContainer = headerElement.querySelector('.trip-controls__filters');
@@ -14,20 +16,12 @@ const infoElement = headerElement.querySelector('.trip-main');
 const mainElement = document.querySelector('.page-main');
 const eventsContainer = mainElement.querySelector('.trip-events');
 
-const pointModel = new PointModel();
-const offerModel = new OfferModel();
-const destinationModel = new DestinationModel();
+const api = new BigTripApi(API_URL, AUTHORIZATION);
+
+const pointModel = new PointModel(api);
+const offerModel = new OfferModel(api);
+const destinationModel = new DestinationModel(api);
 const filterModel = new FilterModel();
-
-pointModel.init();
-offerModel.init();
-destinationModel.init();
-
-const filterPresenter = new FilterPresenter({
-  container: filterContainer,
-  pointModel,
-  filterModel,
-});
 
 const boardPresenter = new BoardPresenter({
   container: eventsContainer,
@@ -37,13 +31,30 @@ const boardPresenter = new BoardPresenter({
   filterModel,
 });
 
+boardPresenter.init();
+
+const filterPresenter = new FilterPresenter({
+  container: filterContainer,
+  pointModel,
+  filterModel,
+});
+
 const infoPresenter = new InfoPresenter({
   container: infoElement,
   pointModel,
-  offerModel,
   destinationModel,
 });
 
-infoPresenter.init();
-filterPresenter.init();
-boardPresenter.init();
+Promise.all([
+  pointModel.init(),
+  offerModel.init(),
+  destinationModel.init(),
+])
+  .then(() => {
+    filterPresenter.init();
+    infoPresenter.init();
+  })
+  .catch(() => {
+    filterPresenter.init();
+    infoPresenter.init();
+  });

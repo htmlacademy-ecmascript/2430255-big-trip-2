@@ -8,16 +8,6 @@ dayjs.extend(duration);
 
 const isEscapeKey = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
-const getRandomInteger = (a, b) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-  const result = Math.random() * (upper - lower + 1) + lower;
-  return Math.floor(result);
-};
-
-const getRandomArrayElement = (elements) =>
-  elements[getRandomInteger(0, elements.length - 1)];
-
 const convertDate = (date, formatKey) =>
   dayjs.utc(date).utcOffset(1, true).format(DATE_FORMAT[formatKey]);
 
@@ -108,10 +98,13 @@ const updateItem = function (items, update) {
   return items.map((item) => (item.id === update.id ? update : item));
 };
 
+const generateAuthString = () => {
+  const randomString = Math.random().toString(36).substring(2);
+  return `Basic ${randomString}`;
+};
+
 export {
   isEscapeKey,
-  getRandomInteger,
-  getRandomArrayElement,
   convertDate,
   getDuration,
   getEventDuration,
@@ -119,4 +112,5 @@ export {
   calculateTotalPrice,
   getRouteInfo,
   updateItem,
+  generateAuthString
 };

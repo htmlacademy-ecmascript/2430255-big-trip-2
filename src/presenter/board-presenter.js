@@ -1,11 +1,13 @@
 import { render, replace, remove } from '../framework/render.js';
 import PointsListView from '../view/points-list-view.js';
 import SortingView from '../view/sorting-view.js';
-import PointEditFormView from '../view/edit-form-view.js';
+import LoadingView from '../view/loading-view.js';
+import ErrorView from '../view/error-view.js';
 import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
 import { sortByDay, sortByTime, sortByPrice } from '../utils/sort.js';
 import PointPresenter from './point-presenter.js';
+import NewPointPresenter from './new-point-presenter.js';
 
 export default class BoardPresenter {
   #mainContainer = null;
@@ -16,12 +18,14 @@ export default class BoardPresenter {
 
   #sortingComponent = null;
   #pointsListComponent = new PointsListView();
+  #loadingComponent = new LoadingView();
+  #errorComponent = new ErrorView();
 
   #currentSortType = SortType.DAY;
   #pointPresenters = new Map();
-
-  #newPointComponent = null;
-  #newPointOpen = false;
+  #newPointPresenter = null;
+  #isLoading = true;
+  #isError = false;
 
   constructor({
     container,
@@ -38,6 +42,8 @@ export default class BoardPresenter {
 
     this.#pointModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#offerModel.addObserver(this.#handleModelEvent);
+    this.#destinationModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
@@ -45,13 +51,31 @@ export default class BoardPresenter {
 
     const newEventButton = document.querySelector('.trip-main__event-add-btn');
     if (newEventButton) {
+      newEventButton.removeEventListener('click', this.#handleNewPointClick);
       newEventButton.addEventListener('click', this.#handleNewPointClick);
     }
   }
 
-  #handleModelEvent = (updateType) => {
+  #handleModelEvent = (updateType, data) => {
     switch (updateType) {
+      case UpdateType.INIT:
+        if (data?.error) {
+          this.#isLoading = false;
+          this.#isError = true;
+          this.#clearBoard();
+          this.#renderBoard();
+          return;
+        }
+
+        this.#isLoading = false;
+        this.#isError = false;
+        this.#clearBoard();
+        this.#renderBoard();
+        break;
+
+
       case UpdateType.PATCH:
+        this.#pointPresenters.get(data.id).init(data);
         break;
 
       case UpdateType.MINOR:
@@ -66,18 +90,18 @@ export default class BoardPresenter {
     }
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointModel.updatePoint(update);
+        await this.#pointModel.updatePoint(updateType, update);
         break;
 
       case UserAction.ADD_POINT:
-        this.#pointModel.addPoint(update);
+        await this.#pointModel.addPoint(updateType, update);
         break;
 
       case UserAction.DELETE_POINT:
-        this.#pointModel.deletePoint(update);
+        await this.#pointModel.deletePoint(updateType, update);
         break;
     }
   };
@@ -96,23 +120,62 @@ export default class BoardPresenter {
     this.#renderPoints();
   };
 
-  #clearPoints() {
-    this.#pointPresenters.forEach((p) => p.destroy());
-    this.#pointPresenters.clear();
-  }
+  #handleNewPointClick = (evt) => {
+    evt.preventDefault();
+    this.#handleModeChange();
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#currentSortType = SortType.DAY;
+    evt.target.disabled = true;
+    this.#newPointPresenter.setContainer(this.#pointsListComponent.element);
+    this.#newPointPresenter.init();
+  };
 
-  #clearBoard() {
-    this.#clearPoints();
-
-    remove(this.#sortingComponent);
-    this.#sortingComponent = null;
-  }
+  #handleNewPointDestroy = () => {
+    const btn = document.querySelector('.trip-main__event-add-btn');
+    if (btn) {
+      btn.disabled = false;
+    }
+  };
 
   #renderBoard() {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
+    if (this.#isError) {
+      this.#renderError();
+      return;
+    }
+
     this.#renderSorting();
     this.#clearPointList();
     render(this.#pointsListComponent, this.#mainContainer);
     this.#renderPoints();
+
+    this.#newPointPresenter = new NewPointPresenter({
+      container: this.#pointsListComponent.element,
+      offers: this.#offerModel.offers,
+      destinations: this.#destinationModel.destinations,
+      onDataChange: this.#handleViewAction,
+      onDestroy: this.#handleNewPointDestroy,
+    });
+  }
+
+  #clearBoard() {
+    remove(this.#loadingComponent);
+    remove(this.#errorComponent);
+    remove(this.#sortingComponent);
+    this.#clearPoints();
+    this.#sortingComponent = null;
+  }
+
+  #renderLoading() {
+    render(this.#loadingComponent, this.#mainContainer);
+  }
+
+  #renderError() {
+    render(this.#errorComponent, this.#mainContainer);
   }
 
   #renderSorting() {
@@ -130,24 +193,6 @@ export default class BoardPresenter {
 
     replace(this.#sortingComponent, prev);
     remove(prev);
-  }
-
-  #getFilteredPoints() {
-    const filterType = this.#filterModel.filter;
-    const points = this.#pointModel.points;
-
-    return filter[filterType](points);
-  }
-
-  #getSortedPoints(points) {
-    switch (this.#currentSortType) {
-      case SortType.TIME:
-        return [...points].sort(sortByTime);
-      case SortType.PRICE:
-        return [...points].sort(sortByPrice);
-      default:
-        return [...points].sort(sortByDay);
-    }
   }
 
   #renderPoints() {
@@ -180,80 +225,30 @@ export default class BoardPresenter {
     this.#pointPresenters.set(point.id, presenter);
   }
 
-  #createEmptyPoint() {
-    return {
-      id: null,
-      type: 'flight',
-      dateFrom: null,
-      dateTo: null,
-      destination: null,
-      basePrice: '',
-      isFavorite: false,
-      offers: []
-    };
+  #getFilteredPoints() {
+    const filterType = this.#filterModel.filter;
+    const points = this.#pointModel.points;
+
+    return filter[filterType](points);
   }
 
-  #handleNewPointClick = (evt) => {
-    evt.preventDefault();
-
-    if (this.#newPointOpen) {
-      return;
+  #getSortedPoints(points) {
+    switch (this.#currentSortType) {
+      case SortType.TIME:
+        return [...points].sort(sortByTime);
+      case SortType.PRICE:
+        return [...points].sort(sortByPrice);
+      default:
+        return [...points].sort(sortByDay);
     }
+  }
 
-    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#currentSortType = SortType.DAY;
-
-    this.#handleModeChange();
-
-    this.#newPointComponent = new PointEditFormView({
-      point: this.#createEmptyPoint(),
-      offers: this.#offerModel.offers,
-      destinations: this.#destinationModel.destinations,
-    });
-
-    this.#newPointComponent._restoreHandlers();
-    this.#newPointComponent.setFormSubmitHandler(this.#handleNewFormSubmit);
-    this.#newPointComponent.setDeleteClickHandler(this.#handleNewFormCancel);
-
-    render(
-      this.#newPointComponent,
-      this.#pointsListComponent.element,
-      'afterbegin'
-    );
-
-    this.#newPointOpen = true;
-
-    const newEventButton = document.querySelector('.trip-main__event-add-btn');
-    if (newEventButton) {
-      newEventButton.disabled = true;
-    }
-  };
-
-  #handleNewFormSubmit = (newPoint) => {
-    this.#handleViewAction(UserAction.ADD_POINT, UpdateType.MAJOR, newPoint);
-    this.#destroyNewForm();
-  };
-
-  #handleNewFormCancel = () => {
-    this.#destroyNewForm();
-  };
+  #clearPoints() {
+    this.#pointPresenters.forEach((p) => p.destroy());
+    this.#pointPresenters.clear();
+  }
 
   #clearPointList() {
     this.#pointsListComponent.element.innerHTML = '';
-  }
-
-  #destroyNewForm() {
-    if (!this.#newPointComponent) {
-      return;
-    }
-
-    remove(this.#newPointComponent);
-    this.#newPointComponent = null;
-    this.#newPointOpen = false;
-
-    const newEventButton = document.querySelector('.trip-main__event-add-btn');
-    if (newEventButton) {
-      newEventButton.disabled = false;
-    }
   }
 }

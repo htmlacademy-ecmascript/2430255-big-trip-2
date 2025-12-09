@@ -48,8 +48,10 @@ export default class FilterPresenter {
     }));
   }
 
-  #handleModelEvent = () => {
-    this.init();
+  #handleModelEvent = (updateType) => {
+    if (updateType === UpdateType.INIT || updateType === UpdateType.MINOR || updateType === UpdateType.MAJOR) {
+      this.init();
+    }
   };
 
   #handleFilterTypeChange = (newFilter) => {
