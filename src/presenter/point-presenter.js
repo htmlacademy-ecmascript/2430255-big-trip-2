@@ -82,6 +82,7 @@ export default class PointPresenter {
   }
 
   #handleFormSubmit = async (updatedPoint) => {
+    this.#pointEditComponent.setSaving();
     try {
       await this.#handleViewAction(
         UserAction.UPDATE_POINT,
@@ -90,7 +91,7 @@ export default class PointPresenter {
       );
       this.#replaceFormToPoint();
     } catch (error) {
-      throw new Error('Failed to update point');
+      this.#pointEditComponent.setAborting();
     }
   };
 
@@ -112,6 +113,7 @@ export default class PointPresenter {
       this.destroy();
       return;
     }
+    this.#pointEditComponent.setDeleting();
 
     try {
       await this.#handleViewAction(
@@ -120,7 +122,7 @@ export default class PointPresenter {
         point
       );
     } catch (error) {
-      throw new Error('Failed to delete point');
+      this.#pointEditComponent.setAborting();
     }
   };
 
