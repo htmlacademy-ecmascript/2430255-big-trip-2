@@ -14,10 +14,10 @@ export default class PointModel extends Observable {
     try {
       const points = await this.#api.points;
       this.#points = points;
-      this._notify(UpdateType.INIT);
+      this._notify(UpdateType.INIT, { type: 'points' });
     } catch (error) {
       this.#points = [];
-      this._notify(UpdateType.INIT);
+      this._notify(UpdateType.INIT, { type: 'points', error: true });
     }
   }
 

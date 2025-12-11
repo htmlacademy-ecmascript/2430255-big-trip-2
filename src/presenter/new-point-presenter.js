@@ -55,6 +55,7 @@ export default class NewPointPresenter {
   }
 
   #handleFormSubmit = async (point) => {
+    this.#newPointComponent.setSaving();
     try {
       await this.#onDataChange(
         UserAction.ADD_POINT,
@@ -63,7 +64,7 @@ export default class NewPointPresenter {
       );
       this.destroy();
     } catch (error) {
-      throw new Error('Failed to add point');
+      this.#newPointComponent.setAborting();
     }
   };
 

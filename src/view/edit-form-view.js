@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { EVENT_TYPES } from '../const.js';
+import { EVENT_TYPES, SHAKE_ANIMATION_TIMEOUT } from '../const.js';
 import { convertDate, capitalizeFirstLetter } from '../utils/common.js';
 import 'flatpickr/dist/flatpickr.min.css';
 import flatpickr from 'flatpickr';
@@ -72,8 +72,18 @@ function createDestinationTemplate(destinationData) {
   `;
 }
 
+function getResetButtonText(isDeleting, isNewPoint) {
+  if (isDeleting) {
+    return 'Deleting...';
+  }
+  if (isNewPoint) {
+    return 'Cancel';
+  }
+  return 'Delete';
+}
+
 function createPointEditFormTemplate(point, offers, destinations) {
-  const { type, destination, basePrice, dateFrom, dateTo, id } = point;
+  const { type, destination, basePrice, dateFrom, dateTo, id, isSaving, isDeleting, isDisabled } = point;
 
   const isNewPoint = !id;
 
@@ -86,6 +96,9 @@ function createPointEditFormTemplate(point, offers, destinations) {
   const endDate = dateTo
     ? `${convertDate(dateTo, 'CALENDAR_DATE')} ${convertDate(dateTo, 'ONLY_TIME')}`
     : '';
+
+  const saveButtonText = isSaving ? 'Saving...' : 'Save';
+  const disabledAttr = isDisabled ? 'disabled' : '';
 
   return `
     <li class="trip-events__item">
@@ -105,10 +118,10 @@ function createPointEditFormTemplate(point, offers, destinations) {
             <input
               class="event__type-toggle visually-hidden"
               id="event-type-toggle-1"
-              type="checkbox">
+              type="checkbox" ${disabledAttr}>
 
             <div class="event__type-list">
-              <fieldset class="event__type-group">
+              <fieldset class="event__type-group" ${disabledAttr}>
                 <legend class="visually-hidden">Event type</legend>
                 ${EVENT_TYPES.map(
     (eventType) => `
@@ -119,7 +132,7 @@ function createPointEditFormTemplate(point, offers, destinations) {
                         type="radio"
                         name="event-type"
                         value="${eventType}"
-                        ${eventType === type ? 'checked' : ''}>
+                        ${eventType === type ? 'checked' : ''} ${disabledAttr}>
                       <label
                         class="event__type-label event__type-label--${eventType}"
                         for="event-type-${eventType}-1">
@@ -143,7 +156,7 @@ function createPointEditFormTemplate(point, offers, destinations) {
               name="event-destination"
               value="${destinationData ? destinationData.name : ''}"
               list="destination-list-1"
-              required>
+              required ${disabledAttr}>
             <datalist id="destination-list-1">
               ${destinations
     .map((dest) => `<option value="${dest.name}"></option>`)
@@ -159,7 +172,7 @@ function createPointEditFormTemplate(point, offers, destinations) {
               type="text"
               name="event-start-time"
               value="${startDate}"
-              required>
+              required ${disabledAttr}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
             <input
@@ -168,7 +181,7 @@ function createPointEditFormTemplate(point, offers, destinations) {
               type="text"
               name="event-end-time"
               value="${endDate}"
-              required>
+              required ${disabledAttr}>
           </div>
 
           <div class="event__field-group event__field-group--price">
@@ -183,16 +196,16 @@ function createPointEditFormTemplate(point, offers, destinations) {
               name="event-price"
               value="${basePrice}"
               min="0"
-              required>
+              required ${disabledAttr}>
           </div>
 
-          <button class="event__save-btn btn btn--blue" type="submit" ${!destinationData || !dateFrom || !dateTo || basePrice === '' ? 'disabled' : ''}>Save</button>
+          <button class="event__save-btn btn btn--blue" type="submit" ${(!destinationData || !dateFrom || !dateTo || basePrice === '' || isDisabled) ? 'disabled' : ''}>${saveButtonText}</button>
           <button class="event__reset-btn" type="reset">
-            ${isNewPoint ? 'Cancel' : 'Delete'}
+            ${getResetButtonText(isDeleting, isNewPoint)}
           </button>
 
           ${!isNewPoint ? `
-            <button class="event__rollup-btn" type="button">
+            <button class="event__rollup-btn" type="button" ${disabledAttr}>
               <span class="visually-hidden">Open event</span>
             </button>
           ` : ''}
@@ -217,7 +230,13 @@ export default class PointEditFormView extends AbstractStatefulView {
 
   constructor({ point, offers, destinations }) {
     super();
-    this._state = structuredClone(point);
+    this._state = {
+      ...structuredClone(point),
+      isSaving: false,
+      isDeleting: false,
+      isDisabled: false
+    };
+
     this.#offers = offers;
     this.#destinations = destinations;
     this.#isValid = this.#validateForm();
@@ -234,7 +253,12 @@ export default class PointEditFormView extends AbstractStatefulView {
   }
 
   reset(point) {
-    this.updateElement(structuredClone(point));
+    this.updateElement({
+      ...structuredClone(point),
+      isSaving: false,
+      isDeleting: false,
+      isDisabled: false
+    });
   }
 
   removeElement() {
@@ -292,6 +316,34 @@ export default class PointEditFormView extends AbstractStatefulView {
 
     this.#setDatepickers();
     this.#updateSaveButton();
+  }
+
+  setSaving() {
+    this.updateElement({
+      isSaving: true,
+      isDisabled: true,
+    });
+  }
+
+  setDeleting() {
+    this.updateElement({
+      isDeleting: true,
+      isDisabled: true,
+    });
+  }
+
+  setAborting() {
+    const element = this.element;
+    element.classList.add('shake');
+
+    setTimeout(() => {
+      element.classList.remove('shake');
+      this.updateElement({
+        isSaving: false,
+        isDeleting: false,
+        isDisabled: false,
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   setFormSubmitHandler(callback) {
@@ -392,7 +444,7 @@ export default class PointEditFormView extends AbstractStatefulView {
   #updateSaveButton() {
     const saveButton = this.element.querySelector('.event__save-btn');
     if (saveButton) {
-      saveButton.disabled = !this.#isValid;
+      saveButton.disabled = !this.#isValid || this._state.isDisabled;
     }
   }
 

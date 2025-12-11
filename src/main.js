@@ -31,8 +31,6 @@ const boardPresenter = new BoardPresenter({
   filterModel,
 });
 
-boardPresenter.init();
-
 const filterPresenter = new FilterPresenter({
   container: filterContainer,
   pointModel,
@@ -45,10 +43,12 @@ const infoPresenter = new InfoPresenter({
   destinationModel,
 });
 
+boardPresenter.init();
+
 Promise.all([
   pointModel.init(),
   offerModel.init(),
-  destinationModel.init(),
+  destinationModel.init()
 ])
   .then(() => {
     filterPresenter.init();

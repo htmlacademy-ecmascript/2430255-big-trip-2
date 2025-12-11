@@ -27,6 +27,8 @@ const API_URL = 'https://22.objects.htmlacademy.pro/big-trip';
 
 const AUTHORIZATION = generateAuthString();
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 const FilterType = {
   EVERYTHING: 'EVERYTHING',
   PAST: 'PAST',
@@ -58,6 +60,7 @@ export {
   DATE_FORMAT,
   API_URL,
   AUTHORIZATION,
+  SHAKE_ANIMATION_TIMEOUT,
   FilterType,
   SortType,
   UpdateType,

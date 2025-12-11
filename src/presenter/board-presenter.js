@@ -8,6 +8,12 @@ import { filter } from '../utils/filter.js';
 import { sortByDay, sortByTime, sortByPrice } from '../utils/sort.js';
 import PointPresenter from './point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+
+const UiBlockerConfig = {
+  lowerLimit: 350,
+  upperLimit: 1000,
+};
 
 export default class BoardPresenter {
   #mainContainer = null;
@@ -24,8 +30,15 @@ export default class BoardPresenter {
   #currentSortType = SortType.DAY;
   #pointPresenters = new Map();
   #newPointPresenter = null;
+
   #isLoading = true;
   #isError = false;
+  #pointsLoaded = false;
+  #offersLoaded = false;
+  #destinationsLoaded = false;
+  #hasAnyError = false;
+
+  #uiBlocker = null;
 
   constructor({
     container,
@@ -39,6 +52,8 @@ export default class BoardPresenter {
     this.#offerModel = offerModel;
     this.#destinationModel = destinationModel;
     this.#filterModel = filterModel;
+
+    this.#uiBlocker = new UiBlocker(UiBlockerConfig);
 
     this.#pointModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -59,20 +74,32 @@ export default class BoardPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.INIT:
-        if (data?.error) {
-          this.#isLoading = false;
-          this.#isError = true;
+        if (data && data.type) {
+          if (data.type === 'points') {
+            this.#pointsLoaded = true;
+          } else if (data.type === 'offers') {
+            this.#offersLoaded = true;
+          } else if (data.type === 'destinations') {
+            this.#destinationsLoaded = true;
+          }
+
+          if (data.error) {
+            this.#hasAnyError = true;
+          }
+        }
+
+        if (!this.#pointsLoaded || !this.#offersLoaded || !this.#destinationsLoaded) {
+          this.#isLoading = true;
           this.#clearBoard();
           this.#renderBoard();
           return;
         }
 
         this.#isLoading = false;
-        this.#isError = false;
+        this.#isError = this.#hasAnyError;
         this.#clearBoard();
         this.#renderBoard();
         break;
-
 
       case UpdateType.PATCH:
         this.#pointPresenters.get(data.id).init(data);
@@ -91,18 +118,24 @@ export default class BoardPresenter {
   };
 
   #handleViewAction = async (actionType, updateType, update) => {
-    switch (actionType) {
-      case UserAction.UPDATE_POINT:
-        await this.#pointModel.updatePoint(updateType, update);
-        break;
+    this.#uiBlocker.block();
 
-      case UserAction.ADD_POINT:
-        await this.#pointModel.addPoint(updateType, update);
-        break;
+    try {
+      switch (actionType) {
+        case UserAction.UPDATE_POINT:
+          await this.#pointModel.updatePoint(updateType, update);
+          break;
 
-      case UserAction.DELETE_POINT:
-        await this.#pointModel.deletePoint(updateType, update);
-        break;
+        case UserAction.ADD_POINT:
+          await this.#pointModel.addPoint(updateType, update);
+          break;
+
+        case UserAction.DELETE_POINT:
+          await this.#pointModel.deletePoint(updateType, update);
+          break;
+      }
+    } finally {
+      this.#uiBlocker.unblock();
     }
   };
 
