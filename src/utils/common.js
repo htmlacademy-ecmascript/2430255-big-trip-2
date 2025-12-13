@@ -37,12 +37,41 @@ const getEventDuration = (point) =>
 const capitalizeFirstLetter = (word = '') =>
   word ? word[0].toUpperCase() + word.slice(1) : '';
 
-const calculateTotalPrice = (points) =>
-  points.reduce((total, point) => {
-    const pointOffersPrice =
-      point.offers?.reduce((sum, offer) => sum + offer.price, 0) || 0;
-    return total + point.basePrice + pointOffersPrice;
+const buildOfferPriceMap = (allOffers = []) => (allOffers || [])
+  .flatMap((group) => group.offers || [])
+  .reduce((map, offer) => {
+    if (offer && typeof offer.id !== 'undefined') {
+      map[offer.id] = Number(offer.price) || 0;
+    }
+    return map;
+  }, {});
+
+const sumPointOffers = (pointOffers = [], offerPriceMap = {}) => {
+  if (!Array.isArray(pointOffers) || pointOffers.length === 0) {
+    return 0;
+  }
+
+  if (Object.keys(offerPriceMap).length > 0) {
+    return pointOffers.reduce((sum, idOrObj) => {
+      if (typeof idOrObj === 'string' || typeof idOrObj === 'number') {
+        return sum + (offerPriceMap[idOrObj] ?? 0);
+      }
+      return sum + (Number(idOrObj?.price) || 0);
+    }, 0);
+  }
+
+  return pointOffers.reduce((sum, offerObj) => sum + (Number(offerObj?.price) || 0), 0);
+};
+
+const calculateTotalPrice = (points = [], allOffers = []) => {
+  const offerPriceMap = buildOfferPriceMap(allOffers);
+
+  return (points || []).reduce((total, point) => {
+    const base = Number(point.basePrice) || 0;
+    const offersPrice = sumPointOffers(point.offers, offerPriceMap);
+    return total + base + offersPrice;
   }, 0);
+};
 
 const getRouteInfo = (points, destinations) => {
   if (!points || points.length === 0) {

@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view';
 import { calculateTotalPrice, getRouteInfo } from '../utils/common.js';
 
-function createTripInfoTemplate(points, destinations) {
+function createTripInfoTemplate(points, destinations, offers) {
   if (!points || points.length === 0) {
     return `
       <section class="trip-main__trip-info trip-info">
@@ -15,7 +15,7 @@ function createTripInfoTemplate(points, destinations) {
     `;
   }
 
-  const totalPrice = calculateTotalPrice(points);
+  const totalPrice = calculateTotalPrice(points, offers);
   const routeInfo = getRouteInfo(points, destinations);
 
   return `
@@ -34,14 +34,16 @@ function createTripInfoTemplate(points, destinations) {
 export default class TripInfoView extends AbstractView {
   #points = null;
   #destinations = null;
+  #offers = null;
 
-  constructor({ points, destinations }) {
+  constructor({ points, destinations, offers }) {
     super();
     this.#points = points;
     this.#destinations = destinations;
+    this.#offers = offers;
   }
 
   get template() {
-    return createTripInfoTemplate(this.#points, this.#destinations);
+    return createTripInfoTemplate(this.#points, this.#destinations, this.#offers);
   }
 }

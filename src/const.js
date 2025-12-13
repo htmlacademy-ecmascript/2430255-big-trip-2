@@ -29,6 +29,11 @@ const AUTHORIZATION = generateAuthString();
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
+const UI_BLOCKER_CONFIG = {
+  lowerLimit: 350,
+  upperLimit: 1000,
+};
+
 const FilterType = {
   EVERYTHING: 'EVERYTHING',
   PAST: 'PAST',
@@ -61,6 +66,7 @@ export {
   API_URL,
   AUTHORIZATION,
   SHAKE_ANIMATION_TIMEOUT,
+  UI_BLOCKER_CONFIG,
   FilterType,
   SortType,
   UpdateType,
