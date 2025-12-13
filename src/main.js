@@ -41,6 +41,7 @@ const infoPresenter = new InfoPresenter({
   container: infoElement,
   pointModel,
   destinationModel,
+  offerModel,
 });
 
 boardPresenter.init();

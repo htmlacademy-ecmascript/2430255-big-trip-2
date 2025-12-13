@@ -83,13 +83,24 @@ export default class PointPresenter {
 
   #handleFormSubmit = async (updatedPoint) => {
     this.#pointEditComponent.setSaving();
+
+    const isNewPoint = !updatedPoint.id;
+
+    const action = isNewPoint ? UserAction.ADD_POINT : UserAction.UPDATE_POINT;
+    const updateType = isNewPoint ? UpdateType.MAJOR : UpdateType.MINOR;
+
     try {
       await this.#handleViewAction(
-        UserAction.UPDATE_POINT,
-        UpdateType.MINOR,
+        action,
+        updateType,
         updatedPoint
       );
-      this.#replaceFormToPoint();
+
+      if (isNewPoint) {
+        this.destroy();
+      } else {
+        this.#replaceFormToPoint();
+      }
     } catch (error) {
       this.#pointEditComponent.setAborting();
     }

@@ -3,17 +3,12 @@ import PointsListView from '../view/points-list-view.js';
 import SortingView from '../view/sorting-view.js';
 import LoadingView from '../view/loading-view.js';
 import ErrorView from '../view/error-view.js';
-import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
+import { SortType, UpdateType, UserAction, FilterType, UI_BLOCKER_CONFIG } from '../const.js';
 import { filter } from '../utils/filter.js';
 import { sortByDay, sortByTime, sortByPrice } from '../utils/sort.js';
 import PointPresenter from './point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
-
-const UiBlockerConfig = {
-  lowerLimit: 350,
-  upperLimit: 1000,
-};
 
 export default class BoardPresenter {
   #mainContainer = null;
@@ -53,7 +48,7 @@ export default class BoardPresenter {
     this.#destinationModel = destinationModel;
     this.#filterModel = filterModel;
 
-    this.#uiBlocker = new UiBlocker(UiBlockerConfig);
+    this.#uiBlocker = new UiBlocker(UI_BLOCKER_CONFIG);
 
     this.#pointModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
