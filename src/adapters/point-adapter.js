@@ -26,7 +26,7 @@ export default class PointAdapter {
       'date_to': point.dateTo instanceof Date ? point.dateTo.toISOString() : point.dateTo,
       'is_favorite': !!point.isFavorite,
       destination: point.destination,
-      offers: point.offers ?? [],
+      offers: Array.isArray(point.offers) ? point.offers.slice() : [],
       type: point.type,
     };
 

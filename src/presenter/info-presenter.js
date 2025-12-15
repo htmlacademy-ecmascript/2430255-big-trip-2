@@ -6,15 +6,20 @@ export default class InfoPresenter {
   #container = null;
   #pointModel = null;
   #destinationModel = null;
+  #offerModel = null;
   #tripInfoComponent = null;
 
-  constructor({ container, pointModel, destinationModel }) {
+  constructor({ container, pointModel, destinationModel, offerModel }) {
     this.#container = container;
     this.#pointModel = pointModel;
     this.#destinationModel = destinationModel;
+    this.#offerModel = offerModel;
 
     this.#pointModel.addObserver(this.#handleModelEvent);
     this.#destinationModel.addObserver(this.#handleModelEvent);
+    if (this.#offerModel) {
+      this.#offerModel.addObserver(this.#handleModelEvent);
+    }
   }
 
   init() {
@@ -24,6 +29,7 @@ export default class InfoPresenter {
   #renderInfo() {
     const points = this.#pointModel.points;
     const destinations = this.#destinationModel.destinations;
+    const offers = this.#offerModel ? this.#offerModel.offers : [];
 
     if (points.length === 0) {
       if (this.#tripInfoComponent) {
@@ -38,6 +44,7 @@ export default class InfoPresenter {
     this.#tripInfoComponent = new TripInfoView({
       points,
       destinations,
+      offers,
     });
 
     if (prevComponent === null) {

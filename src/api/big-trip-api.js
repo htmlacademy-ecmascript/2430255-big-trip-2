@@ -1,7 +1,5 @@
 import ApiService from '../framework/api-service.js';
 import PointAdapter from '../adapters/point-adapter.js';
-import DestinationAdapter from '../adapters/destination-adapter.js';
-import OfferAdapter from '../adapters/offer-adapter.js';
 
 const Method = {
   GET: 'GET',
@@ -29,14 +27,12 @@ export default class BigTripApi extends ApiService {
 
   get destinations() {
     return this._load({ url: Url.DESTINATIONS })
-      .then(ApiService.parseResponse)
-      .then((destinations) => destinations.map(DestinationAdapter.adaptToClient));
+      .then(ApiService.parseResponse);
   }
 
   get offers() {
     return this._load({ url: Url.OFFERS })
-      .then(ApiService.parseResponse)
-      .then((offers) => offers.map(OfferAdapter.adaptToClient));
+      .then(ApiService.parseResponse);
   }
 
   async updatePoint(point) {

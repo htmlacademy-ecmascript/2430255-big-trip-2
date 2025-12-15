@@ -232,6 +232,7 @@ export default class PointEditFormView extends AbstractStatefulView {
     super();
     this._state = {
       ...structuredClone(point),
+      offers: Array.isArray(point.offers) ? structuredClone(point.offers) : [],
       isSaving: false,
       isDeleting: false,
       isDisabled: false
@@ -449,14 +450,15 @@ export default class PointEditFormView extends AbstractStatefulView {
   }
 
   #offerToggleHandler = (evt) => {
-    const offerId = Number(evt.target.id.replace('event-offer-', ''));
+    const offerId = evt.target.id.replace('event-offer-', '');
 
-    let newOffers = [];
+    const currentOffers = Array.isArray(this._state.offers) ? this._state.offers.slice() : [];
 
+    let newOffers;
     if (evt.target.checked) {
-      newOffers = [...this._state.offers, offerId];
+      newOffers = Array.from(new Set([...currentOffers, offerId]));
     } else {
-      newOffers = this._state.offers.filter((id) => id !== offerId);
+      newOffers = currentOffers.filter((id) => id !== offerId);
     }
 
     this._setState({ offers: newOffers });
