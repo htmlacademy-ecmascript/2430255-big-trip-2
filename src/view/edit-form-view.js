@@ -420,13 +420,18 @@ export default class PointEditFormView extends AbstractStatefulView {
 
     if (!selectedDestination) {
       evt.target.value = '';
-      this._setState({
+      this.updateElement({
+        ...structuredClone(this._state),
         destination: null,
       });
       return;
     }
 
-    this._setState({ destination: selectedDestination.id });
+    this.updateElement({
+      ...structuredClone(this._state),
+      destination: selectedDestination.id,
+    });
+
     this.#validateFormHandler();
   };
 

@@ -1,6 +1,7 @@
 import { render, remove } from '../framework/render.js';
 import PointEditFormView from '../view/edit-form-view.js';
 import { UserAction, UpdateType } from '../const.js';
+import { isEscapeKey } from '../utils/common.js';
 
 export default class NewPointPresenter {
   #container = null;
@@ -34,11 +35,13 @@ export default class NewPointPresenter {
       destinations: this.#destinations,
     });
 
+    render(this.#newPointComponent, this.#container, 'afterbegin');
+
     this.#newPointComponent._restoreHandlers();
     this.#newPointComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#newPointComponent.setDeleteClickHandler(this.#handleCancel);
 
-    render(this.#newPointComponent, this.#container, 'afterbegin');
+    document.addEventListener('keydown', this.#onEscKeyDown);
   }
 
   destroy() {
@@ -48,6 +51,8 @@ export default class NewPointPresenter {
 
     remove(this.#newPointComponent);
     this.#newPointComponent = null;
+
+    document.removeEventListener('keydown', this.#onEscKeyDown);
 
     if (this.#onDestroy) {
       this.#onDestroy();
@@ -70,6 +75,13 @@ export default class NewPointPresenter {
 
   #handleCancel = () => {
     this.destroy();
+  };
+
+  #onEscKeyDown = (evt) => {
+    if (isEscapeKey(evt)) {
+      evt.preventDefault();
+      this.destroy();
+    }
   };
 
   #createEmptyPoint() {
