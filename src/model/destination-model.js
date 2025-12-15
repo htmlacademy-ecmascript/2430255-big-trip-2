@@ -10,6 +10,10 @@ export default class DestinationModel extends Observable {
     this.#api = api;
   }
 
+  get destinations() {
+    return this.#destinations;
+  }
+
   async init() {
     try {
       this.#destinations = await this.#api.destinations;
@@ -18,9 +22,5 @@ export default class DestinationModel extends Observable {
       this.#destinations = [];
       this._notify(UpdateType.INIT, { type: 'destinations', error: true });
     }
-  }
-
-  get destinations() {
-    return this.#destinations;
   }
 }

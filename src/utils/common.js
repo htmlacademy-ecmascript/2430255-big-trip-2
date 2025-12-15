@@ -6,6 +6,9 @@ import { DATE_FORMAT } from '../const';
 dayjs.extend(utc);
 dayjs.extend(duration);
 
+const AUTH_RANDOM_RADIX = 36;
+const AUTH_SUBSTRING_START = 2;
+
 const isEscapeKey = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
 const convertDate = (date, formatKey) =>
@@ -128,7 +131,7 @@ const updateItem = function (items, update) {
 };
 
 const generateAuthString = () => {
-  const randomString = Math.random().toString(36).substring(2);
+  const randomString = Math.random().toString(AUTH_RANDOM_RADIX).substring(AUTH_SUBSTRING_START);
   return `Basic ${randomString}`;
 };
 
