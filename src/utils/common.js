@@ -55,15 +55,15 @@ const sumPointOffers = (pointOffers = [], offerPriceMap = {}) => {
   }
 
   if (Object.keys(offerPriceMap).length > 0) {
-    return pointOffers.reduce((sum, idOrObj) => {
-      if (typeof idOrObj === 'string' || typeof idOrObj === 'number') {
-        return sum + (offerPriceMap[idOrObj] ?? 0);
+    return pointOffers.reduce((sum, offerEntry) => {
+      if (typeof offerEntry === 'string' || typeof offerEntry === 'number') {
+        return sum + (offerPriceMap[offerEntry] ?? 0);
       }
-      return sum + (Number(idOrObj?.price) || 0);
+      return sum + (Number(offerEntry?.price) || 0);
     }, 0);
   }
 
-  return pointOffers.reduce((sum, offerObj) => sum + (Number(offerObj?.price) || 0), 0);
+  return pointOffers.reduce((sum, offerItem) => sum + (Number(offerItem?.price) || 0), 0);
 };
 
 const calculateTotalPrice = (points = [], allOffers = []) => {
@@ -126,13 +126,9 @@ const getRouteInfo = (points, destinations) => {
   return { title, dates };
 };
 
-const updateItem = function (items, update) {
-  return items.map((item) => (item.id === update.id ? update : item));
-};
-
 const generateAuthString = () => {
-  const randomString = Math.random().toString(AUTH_RANDOM_RADIX).substring(AUTH_SUBSTRING_START);
-  return `Basic ${randomString}`;
+  const authToken = Math.random().toString(AUTH_RANDOM_RADIX).substring(AUTH_SUBSTRING_START);
+  return `Basic ${authToken}`;
 };
 
 export {
@@ -143,6 +139,5 @@ export {
   capitalizeFirstLetter,
   calculateTotalPrice,
   getRouteInfo,
-  updateItem,
   generateAuthString
 };

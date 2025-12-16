@@ -1,6 +1,6 @@
 import { render, replace, remove } from '../framework/render.js';
 import PointView from '../view/point-view.js';
-import PointEditFormView from '../view/edit-form-view.js';
+import PointEditFormView from '../view/point-edit-form-view.js';
 import { isEscapeKey } from '../utils/common.js';
 import { UserAction, UpdateType } from '../const.js';
 
@@ -15,12 +15,15 @@ export default class PointPresenter {
   #handleViewAction = null;
   #handleModeChange = null;
 
-  constructor({ container, offers, destinations, onDataChange, onModeChange }) {
+  #isCreatingCallback = null;
+
+  constructor({ container, offers, destinations, onDataChange, onModeChange, isCreating = null }) {
     this.#container = container;
     this.#offers = offers;
     this.#destinations = destinations;
     this.#handleViewAction = onDataChange;
     this.#handleModeChange = onModeChange;
+    this.#isCreatingCallback = isCreating;
   }
 
   init(point) {
@@ -138,21 +141,25 @@ export default class PointPresenter {
   };
 
   #replacePointToForm() {
+    if (this.#isCreatingCallback && this.#isCreatingCallback()) {
+      return;
+    }
+
     this.#handleModeChange();
     replace(this.#pointEditComponent, this.#pointComponent);
     this.#pointEditComponent._restoreHandlers();
     if (this.#point.id) {
-      document.addEventListener('keydown', this.#onEscKeyDown);
+      document.addEventListener('keydown', this.#escKeyDownHandler);
     }
   }
 
   #replaceFormToPoint() {
     this.#pointEditComponent.reset(this.#point);
     replace(this.#pointComponent, this.#pointEditComponent);
-    document.removeEventListener('keydown', this.#onEscKeyDown);
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
-  #onEscKeyDown = (evt) => {
+  #escKeyDownHandler = (evt) => {
     if (isEscapeKey(evt)) {
       evt.preventDefault();
       this.#pointEditComponent.reset(this.#point);

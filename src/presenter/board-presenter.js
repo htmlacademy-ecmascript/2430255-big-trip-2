@@ -27,6 +27,7 @@ export default class BoardPresenter {
   #newPointPresenter = null;
 
   #isLoading = true;
+  #isCreating = false;
   #isError = false;
   #pointsLoaded = false;
   #offersLoaded = false;
@@ -56,13 +57,35 @@ export default class BoardPresenter {
     this.#destinationModel.addObserver(this.#handleModelEvent);
   }
 
+  #disableControls = (flag) => {
+    if (this.#sortingComponent && this.#sortingComponent.element) {
+      this.#sortingComponent.element
+        .querySelectorAll('input,button,select')
+        .forEach((el) => {
+          el.disabled = flag;
+        });
+    }
+
+    const filtersForm = document.querySelector('.trip-controls__filters');
+    if (filtersForm) {
+      filtersForm.querySelectorAll('input,button,select').forEach((el) => {
+        el.disabled = flag;
+      });
+    }
+
+    const newEventBtn = document.querySelector('.trip-main__event-add-btn');
+    if (newEventBtn) {
+      newEventBtn.disabled = flag;
+    }
+  };
+
   init() {
     this.#renderBoard();
 
     const newEventButton = document.querySelector('.trip-main__event-add-btn');
     if (newEventButton) {
-      newEventButton.removeEventListener('click', this.#handleNewPointClick);
-      newEventButton.addEventListener('click', this.#handleNewPointClick);
+      newEventButton.removeEventListener('click', this.#newEventButtonClickHandler);
+      newEventButton.addEventListener('click', this.#newEventButtonClickHandler);
     }
   }
 
@@ -139,6 +162,10 @@ export default class BoardPresenter {
   };
 
   #handleSortTypeChange = (sortType) => {
+    if (this.#isCreating) {
+      return;
+    }
+
     if (this.#currentSortType === sortType) {
       return;
     }
@@ -148,13 +175,31 @@ export default class BoardPresenter {
     this.#renderPoints();
   };
 
-  #handleNewPointClick = (evt) => {
+  #newEventButtonClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleModeChange();
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+
     this.#currentSortType = SortType.DAY;
+    this.#renderSorting();
+
+    this.#isCreating = true;
+    this.#disableControls(true);
+
     evt.target.disabled = true;
-    this.#newPointPresenter.setContainer(this.#pointsListComponent.element);
+
+    if (!this.#newPointPresenter) {
+      this.#newPointPresenter = new NewPointPresenter({
+        container: this.#pointsListComponent.element,
+        offers: this.#offerModel.offers,
+        destinations: this.#destinationModel.destinations,
+        onDataChange: this.#handleViewAction,
+        onDestroy: this.#handleNewPointDestroy,
+      });
+    } else {
+      this.#newPointPresenter.setContainer(this.#pointsListComponent.element);
+    }
+
     this.#newPointPresenter.init();
   };
 
@@ -163,6 +208,9 @@ export default class BoardPresenter {
     if (btn) {
       btn.disabled = false;
     }
+
+    this.#isCreating = false;
+    this.#disableControls(false);
   };
 
   #renderBoard() {
@@ -226,10 +274,10 @@ export default class BoardPresenter {
   #renderPoints() {
     this.#clearPointList();
 
-    const filtered = this.#getFilteredPoints();
-    const sorted = this.#getSortedPoints(filtered);
+    const filteredPoints = this.#getFilteredPoints();
+    const sortedPoints = this.#getSortedPoints(filteredPoints);
 
-    if (!sorted.length) {
+    if (!sortedPoints.length) {
       this.#pointsListComponent.element.innerHTML = `
       <p class="trip-events__msg">
         There are no ${this.#filterModel.filter} events now
@@ -237,7 +285,7 @@ export default class BoardPresenter {
       return;
     }
 
-    sorted.forEach((point) => this.#renderPoint(point));
+    sortedPoints.forEach((point) => this.#renderPoint(point));
   }
 
   #renderPoint(point) {
@@ -247,6 +295,7 @@ export default class BoardPresenter {
       destinations: this.#destinationModel.destinations,
       onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange,
+      isCreating: () => this.#isCreating,
     });
 
     presenter.init(point);
